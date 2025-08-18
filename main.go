@@ -25,6 +25,7 @@ func main() {
 	app := fiber.New()
 	auth.RegisterGoogleRoutes(app)
 	app.Use(cors.New())
+	controllers.RoutePromt(app)
 	controllers.RouteBaseMateri(app)
 	controllers.RouteOutline(app)
 

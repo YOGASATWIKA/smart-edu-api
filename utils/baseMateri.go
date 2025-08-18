@@ -13,7 +13,7 @@ import (
 
 func GetBaseMateri() ([]respond.BaseMateriRespond, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 
 	var result model.BaseMateri
 	return result.GetAll(collection)
@@ -26,7 +26,7 @@ func GetContext() context.Context {
 
 func CreateBaseMateri(baseMateri model.BaseMateri) (model.BaseMateri, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 
 	// Set the ID of the base materi to the inserted ID
 	baseMateri.ID = primitive.NewObjectID()
@@ -46,7 +46,7 @@ func GetCurrentTime() time.Time {
 
 func IsJobIDExists(Jobid int64) (bool, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 	filter := bson.M{"job_id": Jobid, "status": bson.M{"$ne": "DELETED"}}
 
 	var result model.BaseMateri
@@ -62,7 +62,7 @@ func IsJobIDExists(Jobid int64) (bool, error) {
 
 func IsNameExists(Name string) (bool, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 	filter := bson.M{"nama_jabatan": Name, "status": bson.M{"$ne": "DELETED"}}
 
 	var result model.BaseMateri
@@ -78,7 +78,7 @@ func IsNameExists(Name string) (bool, error) {
 
 func GetBaseMateriByID(id string) (*model.BaseMateri, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -96,7 +96,7 @@ func GetBaseMateriByID(id string) (*model.BaseMateri, error) {
 
 func UpdateBaseMateri(materi *model.BaseMateri) (*model.BaseMateri, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 
 	filter := bson.M{"_id": materi.ID}
 	update := bson.M{"$set": materi}
@@ -111,7 +111,7 @@ func UpdateBaseMateri(materi *model.BaseMateri) (*model.BaseMateri, error) {
 // Fungsi untuk menghapus base materi
 func DeleteBaseMateri(materi *model.BaseMateri) error {
 	client := config.GetMongoClient()
-	collection := client.Database("materi").Collection("skb")
+	collection := client.Database("smart_edu").Collection("skb")
 
 	_, err := collection.DeleteOne(GetContext(), bson.M{"_id": materi.ID})
 	if err != nil {
@@ -119,3 +119,7 @@ func DeleteBaseMateri(materi *model.BaseMateri) error {
 	}
 	return nil
 }
+
+
+
+

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"smart-edu-api/auth"
 	"smart-edu-api/config"
 	"smart-edu-api/controllers"
 
@@ -22,6 +23,7 @@ func main() {
 	config.InitMongoDB()
 
 	app := fiber.New()
+	auth.RegisterGoogleRoutes(app)
 	app.Use(cors.New())
 	controllers.RouteBaseMateri(app)
 	controllers.RouteOutline(app)

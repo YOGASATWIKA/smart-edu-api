@@ -26,13 +26,6 @@ func CreateBaseMateri(c *fiber.Ctx) error {
 		})
 	}
 
-	exists, errCheck := utils.IsJobIDExists(request.Jobid)
-	if errCheck == nil && exists {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Job ID sudah terdaftar, silakan gunakan ID lain.",
-		})
-	}
-
 	existsName, errCheckName := utils.IsNameExists(request.Namajabatan)
 	if errCheckName == nil && existsName {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -40,8 +33,7 @@ func CreateBaseMateri(c *fiber.Ctx) error {
 		})
 	}
 
-	baseMateri, errCreateBaseMateri := utils.CreateBaseMateri(model.BaseMateri{
-		Jobid:        request.Jobid,
+	baseMateri, errCreateBaseMateri := utils.CreateBaseMateri(model.Materi{
 		Namajabatan:  request.Namajabatan,
 		Tugasjabatan: request.Tugasjabatan,
 		Keterampilan: request.Keterampilan,

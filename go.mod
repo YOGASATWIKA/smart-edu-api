@@ -15,10 +15,13 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
+	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/pkoukk/tiktoken-go v0.1.6 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 )
 
 require (
+	github.com/RealAlexandreAI/json-repair v0.0.14
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -27,7 +30,9 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
+	github.com/petermattis/goid v0.0.0-20250813065127-a731cc31b4fe
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/tmc/langchaingo v0.1.13
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

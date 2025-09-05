@@ -38,7 +38,7 @@ func CreateBaseMateri(c *fiber.Ctx) error {
 		Tugasjabatan: request.Tugasjabatan,
 		Keterampilan: request.Keterampilan,
 		Klasifikasi:  request.Klasifikasi,
-		Status:      request.Status,
+		Status:      "ACTIVE",
 		CreatedAt:    utils.GetCurrentTime(),
 	})
 	if errCreateBaseMateri != nil {

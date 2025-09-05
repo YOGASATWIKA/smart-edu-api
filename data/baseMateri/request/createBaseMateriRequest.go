@@ -6,5 +6,4 @@ type CreateBaseMateriRequest struct {
 	Tugasjabatan []string `valid:"required"`
 	Keterampilan []string `valid:"required"`
 	Klasifikasi  string `valid:"required"`
-	Status  string `valid:"required"`
 }

@@ -16,7 +16,6 @@ type Params struct {
 	NamaJabatan     string
 	TugasJabatan    string
 	Keterampilan    string
-	AvailableMateri string
 }
 
 type Outliner struct {
@@ -41,7 +40,7 @@ func (o *Outliner) GenerateWithOfficialMaterial(ctx context.Context, params Para
 	}
 
 	continues := []llms.MessageContent{
-		llms.TextParts(llms.ChatMessageTypeHuman, fmt.Sprintf("Apa kompetensi bidang/teknis yang harus dimiliki oleh seseorang dengan\nNama Jabatan: %s\nMateri Pokok: %s\n\nIngat, Kompetensi bidang/teknis dalam seleksi ASN (Aparatur Sipil Negara) merujuk pada kemampuan atau pengetahuan spesifik yang berkaitan langsung dengan tugas dan fungsi jabatan yang dilamar. Kompetensi ini mencakup keterampilan teknis, pengetahuan, dan pengalaman yang diperlukan untuk melaksanakan pekerjaan tertentu secara efektif.", params.NamaJabatan, params.AvailableMateri)),
+		llms.TextParts(llms.ChatMessageTypeHuman, fmt.Sprintf("Apa kompetensi bidang/teknis yang harus dimiliki oleh seseorang dengan\nNama Jabatan: %s\nMateri Pokok: %s\n\nIngat, Kompetensi bidang/teknis dalam seleksi ASN (Aparatur Sipil Negara) merujuk pada kemampuan atau pengetahuan spesifik yang berkaitan langsung dengan tugas dan fungsi jabatan yang dilamar. Kompetensi ini mencakup keterampilan teknis, pengetahuan, dan pengalaman yang diperlukan untuk melaksanakan pekerjaan tertentu secara efektif.", params.NamaJabatan, params.TugasJabatan)),
 		llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa sub materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Buatkan masing-masing materi pokok berisi 5 sub materi pokok."),
 		llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"]\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t]\n\t }\n"),
 	}

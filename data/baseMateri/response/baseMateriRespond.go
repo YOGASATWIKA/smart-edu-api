@@ -8,7 +8,6 @@ import (
 
 type BaseMateriRespond struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id"`
-	Jobid        int64              `json:"job_id" bson:"job_id"`
 	Namajabatan  string             `json:"nama_jabatan" bson:"nama_jabatan"`
 	Tugasjabatan []string           `json:"tugas_jabatan" bson:"tugas_jabatan"`
 	Keterampilan []string           `json:"keterampilan" bson:"keterampilan"`

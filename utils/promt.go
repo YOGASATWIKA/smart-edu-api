@@ -11,7 +11,7 @@ import (
 
 func CreatePromt(promt model.Promt) (model.Promt, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("promts")
+	collection := client.Database("smart_edu").Collection("models")
 
 	promt.ID = primitive.NewObjectID()
 
@@ -25,7 +25,7 @@ func CreatePromt(promt model.Promt) (model.Promt, error) {
 
 func GetPromt() ([]response.PromtResponse, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("promts")
+	collection := client.Database("smart_edu").Collection("models")
 
 	var result model.Promt
 	return result.GetAll(collection)
@@ -33,7 +33,7 @@ func GetPromt() ([]response.PromtResponse, error) {
 
 func GetPromtById(id string) (*model.Promt, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("promts")
+	collection := client.Database("smart_edu").Collection("models")
 
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

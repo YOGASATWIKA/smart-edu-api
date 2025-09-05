@@ -9,8 +9,7 @@ import (
 func RouteOutline(app *fiber.App) {
 	outlineGroup := app.Group("/outline")
 	outlineGroup.Post("/:id", commandOutline.CreateOutline)
-	// baseMateriGroup.Put("/:id", commandBase.UpdateBaseMateri)
-	// baseMateriGroup.Get("/", queryBase.GetBaseMateri)
+	// outlineGroup.Put("/:id", commandOutline.UpdateBaseMateri)
 	// baseMateriGroup.Delete("/:id", commandBase.DeleteBaseMateri)
 
 }

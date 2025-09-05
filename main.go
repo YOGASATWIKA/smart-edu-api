@@ -6,7 +6,7 @@ import (
 	"smart-edu-api/controllers"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/cors" // 1. Tambahkan import ini
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -23,8 +23,15 @@ func main() {
 	config.InitMongoDB()
 
 	app := fiber.New()
+
+	// 2. Terapkan middleware CORS di sini
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173", // Izinkan origin dari frontend Anda
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization", // Izinkan header yang dibutuhkan
+	}))
+
+	// Daftarkan rute-rute Anda setelah middleware CORS
 	auth.RegisterGoogleRoutes(app)
-	app.Use(cors.New())
 	controllers.RoutePromt(app)
 	controllers.RouteBaseMateri(app)
 	controllers.RouteOutline(app)

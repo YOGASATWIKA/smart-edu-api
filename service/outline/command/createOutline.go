@@ -22,7 +22,7 @@ import (
 
 
 type Job struct {
-	Jabatan *model.Materi
+	Jabatan *model.MateriPokok
 	Outline *outline.Outline
 	Err     error
 }

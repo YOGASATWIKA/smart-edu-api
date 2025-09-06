@@ -33,7 +33,7 @@ func CreateBaseMateri(c *fiber.Ctx) error {
 		})
 	}
 
-	baseMateri, errCreateBaseMateri := utils.CreateBaseMateri(model.Materi{
+	baseMateri, errCreateBaseMateri := utils.CreateBaseMateri(model.MateriPokok{
 		Namajabatan:  request.Namajabatan,
 		Tugasjabatan: request.Tugasjabatan,
 		Keterampilan: request.Keterampilan,

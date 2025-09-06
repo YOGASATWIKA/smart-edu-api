@@ -11,16 +11,30 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Materi struct {
+type MateriPokok struct {
 	ID              primitive.ObjectID `json:"id" bson:"_id"`
 	Namajabatan     string             `json:"nama_jabatan" bson:"nama_jabatan"`
 	Tugasjabatan    []string             `json:"tugas_jabatan" bson:"tugas_jabatan"`
 	Keterampilan    []string             `json:"keterampilan" bson:"keterampilan"`
 	Klasifikasi     string             `json:"klasifikasi" bson:"klasifikasi"`
 	Status 			string             `json:"status" bson:"status"`
+	Outline       Outline             `json:"outline" bson:"outline"`	
 	CreatedAt       time.Time          `json:"created_at" bson:"created_at"`
 	UpdatedAt       time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
 	DeleteAt       	time.Time        `json:"delete_at" bson:"delete_at,omitempty"`
+}
+
+
+type Outline struct {
+	ListMateri  []Materi `json:"list_materi" bson:"list_materi"`
+}
+type Materi struct {
+	MateriPokok   string      `json:"materi_pokok" bson:"materi_pokok"`
+	ListSubMateri []SubMateri `json:"list_sub_materi" bson:"list_sub_materi"`
+}
+type SubMateri struct {
+	SubMateriPokok string   `json:"sub_materi_pokok" bson:"sub_materi_pokok"`
+	ListMateri     []string `json:"list_materi" bson:"list_materi"`
 }
 
 func (b *Materi) GetAll(collection *mongo.Collection) ([]respond.BaseMateriRespond, error) {

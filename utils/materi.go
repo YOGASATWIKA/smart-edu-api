@@ -24,7 +24,7 @@ func GetContext() context.Context {
 	return ctx
 }
 
-func CreateBaseMateri(baseMateri model.Materi) (model.Materi, error) {
+func CreateBaseMateri(baseMateri model.MateriPokok) (model.MateriPokok, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
 
@@ -34,7 +34,7 @@ func CreateBaseMateri(baseMateri model.Materi) (model.Materi, error) {
 	// Insert the base materi into the collection
 	_, err := collection.InsertOne(GetContext(), baseMateri)
 	if err != nil {
-		return model.Materi{}, err
+		return model.MateriPokok{}, err
 	}
 
 
@@ -60,7 +60,7 @@ func IsNameExists(Name string) (bool, error) {
 	return true, nil // nama sudah ada
 }
 
-func GetBaseMateriByID(id string) (*model.Materi, error) {
+func GetBaseMateriByID(id string) (*model.MateriPokok, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
 
@@ -70,7 +70,7 @@ func GetBaseMateriByID(id string) (*model.Materi, error) {
 	}
 
 	filter := bson.M{"_id": objectID}
-	var materi model.Materi
+	var materi model.MateriPokok
 	err = collection.FindOne(GetContext(), filter).Decode(&materi)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func GetBaseMateriByID(id string) (*model.Materi, error) {
 	return &materi, nil
 }
 
-func UpdateBaseMateri(materi *model.Materi) (*model.Materi, error) {
+func UpdateBaseMateri(materi *model.MateriPokok) (*model.MateriPokok, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
 
@@ -93,7 +93,7 @@ func UpdateBaseMateri(materi *model.Materi) (*model.Materi, error) {
 }
 
 // Fungsi untuk menghapus base materi
-func DeleteBaseMateri(materi *model.Materi) error {
+func DeleteBaseMateri(materi *model.MateriPokok) error {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
 

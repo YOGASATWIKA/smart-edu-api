@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"smart-edu-api/auth"
 	"smart-edu-api/config"
 	"smart-edu-api/controllers"
@@ -25,9 +26,11 @@ func main() {
 	app := fiber.New()
 
 	// 2. Terapkan middleware CORS di sini
+	godotenv.Load()
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173",                       // Izinkan origin dari frontend Anda
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization", // Izinkan header yang dibutuhkan
+		AllowOrigins: os.Getenv("PATHFE"),
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 
 	// Daftarkan rute-rute Anda setelah middleware CORS

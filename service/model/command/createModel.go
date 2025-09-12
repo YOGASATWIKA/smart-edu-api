@@ -1,0 +1,48 @@
+package service
+
+import (
+	"smart-edu-api/data/model/request"
+	"smart-edu-api/entity"
+	"smart-edu-api/helper"
+	"smart-edu-api/repository"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gofiber/fiber/v2"
+)
+
+func CreateModel(app *fiber.Ctx) error {
+	request := new(request.CreateModelRequest)
+	if err := app.BodyParser(request); err != nil {
+		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
+			"message": "Invalid request body",
+		})
+	}
+
+	isValid, err := govalidator.ValidateStruct(request)
+	if !isValid && err != nil {
+		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
+			"message": err.Error(),
+		})
+	}
+
+	promt, errCreatePromt := repository.CreateModel(entity.Model{
+		Model:            request.Model,
+		Status:           "ACTIVE",
+		PromtContext:     request.PromtContext,
+		PromtInstruction: request.PromtInstruction,
+		CreatedAt:        helper.GetCurrentTime(),
+	})
+	if errCreatePromt != nil {
+		return app.Status(fiber.StatusInternalServerError).
+			JSON(map[string]any{
+				"message": "server error",
+			})
+	}
+
+	return app.Status(fiber.StatusOK).JSON(
+		map[string]any{
+			"data":    promt,
+			"message": "Model created successfully",
+		},
+	)
+}

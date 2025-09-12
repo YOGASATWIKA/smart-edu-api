@@ -39,7 +39,13 @@ func main() {
 	controllers.RouteMateriPokok(app)
 	controllers.RouteOutline(app)
 
-	if err := app.Listen(":3001"); err != nil {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3001"
+	}
+
+	if err := app.Listen("0.0.0.0:" + port); err != nil {
 		logrus.Fatal("Error on running fiber: ", err.Error())
 	}
 }

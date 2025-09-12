@@ -8,7 +8,7 @@ import (
 	"smart-edu-api/config"
 	outline "smart-edu-api/data/outline/request"
 	"smart-edu-api/entity"
-	generator "smart-edu-api/generator/outine"
+	generator "smart-edu-api/generator/outline"
 	"smart-edu-api/llm"
 	"smart-edu-api/repository"
 	"strings"

@@ -26,14 +26,14 @@ func main() {
 
 	// 2. Terapkan middleware CORS di sini
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173", // Izinkan origin dari frontend Anda
+		AllowOrigins: "http://localhost:5173",                       // Izinkan origin dari frontend Anda
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization", // Izinkan header yang dibutuhkan
 	}))
 
 	// Daftarkan rute-rute Anda setelah middleware CORS
 	auth.RegisterGoogleRoutes(app)
-	controllers.RoutePromt(app)
-	controllers.RouteBaseMateri(app)
+	controllers.RouteModel(app)
+	controllers.RouteMateriPokok(app)
 	controllers.RouteOutline(app)
 
 	if err := app.Listen(":3001"); err != nil {

@@ -7,10 +7,10 @@ import (
 	"os"
 	"smart-edu-api/config"
 	outline "smart-edu-api/data/outline/request"
-	"smart-edu-api/generator"
+	"smart-edu-api/entity"
+	generator "smart-edu-api/generator/outine"
 	"smart-edu-api/llm"
-	"smart-edu-api/model"
-	"smart-edu-api/utils"
+	"smart-edu-api/repository"
 	"strings"
 	"time"
 
@@ -20,21 +20,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 type Job struct {
-	Jabatan *model.MateriPokok
+	Jabatan *entity.MateriPokok
 	Outline *outline.Outline
 	Err     error
 }
+
 func CreateOutline(app *fiber.Ctx) error {
 	godotenv.Load()
 	ctx := context.Background()
-	
+
 	// ambil ID dari path parameter
 	id := app.Params("id")
 
 	// ambil jabatan dari DB berdasarkan _id
-	jabatan, err := utils.GetBaseMateriByID(id)
+	jabatan, err := repository.GetMateriPokokByID(id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Base Materi tidak ditemukan",
@@ -47,9 +47,9 @@ func CreateOutline(app *fiber.Ctx) error {
 	o := generator.New(model)
 
 	otln, err := o.GenerateWithOfficialMaterial(ctx, generator.Params{
-		NamaJabatan:     jabatan.Namajabatan,
-		TugasJabatan:    strings.Join(jabatan.Tugasjabatan, ", "),
-		Keterampilan:    strings.Join(jabatan.Keterampilan, ", "),
+		NamaJabatan:  jabatan.Namajabatan,
+		TugasJabatan: strings.Join(jabatan.Tugasjabatan, ", "),
+		Keterampilan: strings.Join(jabatan.Keterampilan, ", "),
 	})
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -85,14 +85,13 @@ func CreateOutline(app *fiber.Ctx) error {
 }
 
 func CreateOrUpdateOutline(ctx context.Context, job *Job, state string) error {
-		
+
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
-	
 
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	
+
 	filter := bson.D{
 		{
 			"_id", job.Jabatan.ID,

@@ -3,10 +3,11 @@ package auth
 import (
 	"context"
 	"os"
+	"smart-edu-api/config"
+	"smart-edu-api/entity"
 	"strings"
 	"time"
-	"smart-edu-api/config"
-	"smart-edu-api/model"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,7 +33,6 @@ func RegisterGoogleRoutes(app *fiber.App) {
 	profileGroup.Get("/picture", HandleGetUserPicture)
 }
 
-
 // HandleGoogleLogin menangani callback dari frontend setelah login Google
 func HandleGoogleLogin(c *fiber.Ctx) error {
 	// 1. Parse request body dari frontend
@@ -46,7 +46,7 @@ func HandleGoogleLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
 
-	var user model.User
+	var user entity.User
 	// 2. Cari user di database berdasarkan GoogleID
 
 	client := config.GetMongoClient()
@@ -56,7 +56,7 @@ func HandleGoogleLogin(c *fiber.Ctx) error {
 	if err != nil {
 		// Jika user tidak ditemukan, buat user baru
 		if err == mongo.ErrNoDocuments {
-			newUser := model.User{
+			newUser := entity.User{
 				ID:       primitive.NewObjectID(),
 				GoogleID: req.GoogleID,
 				Email:    req.Email,
@@ -130,7 +130,7 @@ func HandleGetProfile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID format"})
 	}
 
-	var userProfile model.User
+	var userProfile entity.User
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("users")
 	err = collection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&userProfile)
@@ -141,14 +141,13 @@ func HandleGetProfile(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(userProfile)
 }
 
-
 // --- HANDLER BARU UNTUK NAMA USER ---
 func HandleGetUserName(c *fiber.Ctx) error {
 	claims := c.Locals("userClaims").(jwt.MapClaims)
 	userIDHex := claims["id"].(string)
 	userID, _ := primitive.ObjectIDFromHex(userIDHex)
 
-	var userProfile model.User
+	var userProfile entity.User
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("users")
 	err := collection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&userProfile)
@@ -166,7 +165,7 @@ func HandleGetUserPicture(c *fiber.Ctx) error {
 	userIDHex := claims["id"].(string)
 	userID, _ := primitive.ObjectIDFromHex(userIDHex)
 
-	var userProfile model.User
+	var userProfile entity.User
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("users")
 	err := collection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&userProfile)

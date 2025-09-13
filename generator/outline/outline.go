@@ -17,6 +17,7 @@ type Params struct {
 	NamaJabatan  string
 	TugasJabatan string
 	Keterampilan string
+	Model        string
 }
 
 type Outliner struct {

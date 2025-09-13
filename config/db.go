@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,7 +13,6 @@ import (
 var mongoClient *mongo.Client
 
 func InitMongoDB() {
-	godotenv.Load()
 	uri := os.Getenv("MONGODB_CONNECTION_STRING")
 	if uri == "" {
 		logrus.Fatal("Mongo DB Connection is not set in environment")
@@ -35,17 +33,14 @@ func InitMongoDB() {
 	mongoClient = client
 	logrus.Info("Connected to MongoDB")
 }
-
 func GetMongoClient() *mongo.Client {
 	return mongoClient
 }
 
-func GetMongoDBConnectionString() string {
-
-	conn := os.Getenv("MONGODB_CONNECTION_STRING")
-	if conn == "" {
-		return "mongodb://localhost:27017"
-	}
-
-	return conn
-}
+//func GetMongoDBConnectionString() string {
+//	conn := os.Getenv("MONGODB_CONNECTION_STRING")
+//	if conn == "" {
+//		return "mongodb://localhost:27017"
+//	}
+//	return conn
+//}

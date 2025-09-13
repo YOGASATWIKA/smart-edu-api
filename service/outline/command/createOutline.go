@@ -25,6 +25,9 @@ type Job struct {
 	Outline *outline.Outline
 	Err     error
 }
+type ModelRequest struct {
+	Model string `json:"model"`
+}
 
 func CreateOutline(app *fiber.Ctx) error {
 	godotenv.Load()
@@ -32,6 +35,14 @@ func CreateOutline(app *fiber.Ctx) error {
 
 	// ambil ID dari path parameter
 	id := app.Params("id")
+
+	var req ModelRequest
+	if err := app.BodyParser(&req); err != nil {
+		return app.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Cannot parse JSON",
+			"error":   err.Error(),
+		})
+	}
 
 	// ambil jabatan dari DB berdasarkan _id
 	jabatan, err := repository.GetMateriPokokByID(id)
@@ -43,7 +54,8 @@ func CreateOutline(app *fiber.Ctx) error {
 
 	// proses generate outline untuk satu data
 	APIKEY := os.Getenv("API_KEY")
-	model := llm.New(ctx, APIKEY)
+	model := llm.New(ctx, APIKEY, req.Model)
+
 	o := generator.New(model)
 
 	otln, err := o.GenerateWithOfficialMaterial(ctx, generator.Params{

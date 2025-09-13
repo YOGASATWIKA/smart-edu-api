@@ -10,11 +10,16 @@ import (
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
-func New(ctx context.Context, apiKey string) llms.Model {
+func New(ctx context.Context, apiKey string, selectedModel string) llms.Model {
+
+	if selectedModel == "" {
+		selectedModel = os.Getenv("MODEL")
+	}
+
 	godotenv.Load()
 	model, err := openai.New(
 		openai.WithToken(apiKey),
-		openai.WithModel(os.Getenv("MODEL")),
+		openai.WithModel(selectedModel),
 		openai.WithBaseURL("https://openrouter.ai/api/v1"),
 	)
 

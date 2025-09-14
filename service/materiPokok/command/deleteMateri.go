@@ -8,10 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func DeleteMateriPokok(c *fiber.Ctx) error {
+func DeleteMateri(c *fiber.Ctx) error {
 	id := c.Params("id")
-
-	// Ambil data
 	existing, err := repository.GetMateriPokokByID(id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -19,12 +17,10 @@ func DeleteMateriPokok(c *fiber.Ctx) error {
 		})
 	}
 
-	// Set soft delete
 	existing.Status = "DELETED"
 	existing.DeleteAt = helper.GetCurrentTime()
 
-	// Simpan perubahan
-	_, err = repository.UpdateMateriPokok(existing)
+	_, err = repository.DeleteMateri(existing)
 	if err != nil {
 		logrus.Printf("Gagal soft delete base materi: %s\n", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

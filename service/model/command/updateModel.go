@@ -21,7 +21,7 @@ func UpdateModel(app *fiber.Ctx) error {
 	}
 
 	// Parse dan validasi body request
-	request := new(request.UpdateModelRequest)
+	request := new(request.ModelRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
 			"message": "Invalid request body",
@@ -36,8 +36,6 @@ func UpdateModel(app *fiber.Ctx) error {
 	}
 
 	existing.Model = request.Model
-	existing.PromtContext = request.PromtContext
-	existing.PromtInstruction = request.PromtInstruction
 	existing.UpdatedAt = helper.GetCurrentTime()
 
 	// Simpan perubahan

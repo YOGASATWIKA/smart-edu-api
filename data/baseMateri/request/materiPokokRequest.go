@@ -1,6 +1,6 @@
 package request
 
-type CreateMateriPokokRequest struct {
+type MateriPokokRequest struct {
 	Namajabatan  string   `valid:"required"`
 	Tugasjabatan []string `valid:"required"`
 	Keterampilan []string `valid:"required"`

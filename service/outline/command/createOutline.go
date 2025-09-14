@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"smart-edu-api/config"
-	outline "smart-edu-api/data/outline/request"
+	"smart-edu-api/embeded"
 	"smart-edu-api/entity"
 	generator "smart-edu-api/generator/outline"
 	"smart-edu-api/llm"
@@ -21,8 +22,8 @@ import (
 )
 
 type Job struct {
-	Jabatan *entity.MateriPokok
-	Outline *outline.Outline
+	Jabatan *entity.Materi
+	Outline *embeded.Outline
 	Err     error
 }
 type ModelRequest struct {
@@ -58,11 +59,12 @@ func CreateOutline(app *fiber.Ctx) error {
 
 	o := generator.New(model)
 
-	otln, err := o.GenerateWithOfficialMaterial(ctx, generator.Params{
+	otln, err := o.Generate(ctx, generator.Params{
 		NamaJabatan:  jabatan.Namajabatan,
 		TugasJabatan: strings.Join(jabatan.Tugasjabatan, ", "),
 		Keterampilan: strings.Join(jabatan.Keterampilan, ", "),
 	})
+	log.Println("generating outline done")
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "failed to generate outline",
@@ -82,7 +84,7 @@ func CreateOutline(app *fiber.Ctx) error {
 	err = CreateOrUpdateOutline(ctx, &Job{
 		Jabatan: jabatan,
 		Outline: &otln,
-	}, "success")
+	}, "OUTLINE")
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "failed to save outline",
@@ -96,7 +98,7 @@ func CreateOutline(app *fiber.Ctx) error {
 	})
 }
 
-func CreateOrUpdateOutline(ctx context.Context, job *Job, state string) error {
+func CreateOrUpdateOutline(ctx context.Context, job *Job, stage string) error {
 
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("skb")
@@ -113,7 +115,7 @@ func CreateOrUpdateOutline(ctx context.Context, job *Job, state string) error {
 	update := bson.D{
 		{
 			"$set", bson.D{
-				{"state", state},
+				{"stage", stage},
 				{"outline", job.Outline},
 			},
 		},

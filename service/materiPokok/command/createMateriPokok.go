@@ -12,7 +12,7 @@ import (
 
 func CreateMateriPokok(c *fiber.Ctx) error {
 
-	request := new(request.CreateMateriPokokRequest)
+	request := new(request.MateriPokokRequest)
 	if err := c.BodyParser(request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(map[string]any{
 			"message": "Invalid request body",
@@ -33,12 +33,13 @@ func CreateMateriPokok(c *fiber.Ctx) error {
 		})
 	}
 
-	materiPokok, err := repository.CreateMateriPokok(entity.MateriPokok{
+	materiPokok, err := repository.CreateMateriPokok(entity.Materi{
 		Namajabatan:  request.Namajabatan,
 		Tugasjabatan: request.Tugasjabatan,
 		Keterampilan: request.Keterampilan,
 		Klasifikasi:  request.Klasifikasi,
 		Status:       "ACTIVE",
+		Stage:        "MATERI_POKOK",
 		CreatedAt:    helper.GetCurrentTime(),
 	})
 	if err != nil {

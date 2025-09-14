@@ -13,9 +13,6 @@ import (
 func CreateModel(model entity.Model) (entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")
-
-	model.ID = primitive.NewObjectID()
-
 	_, err := collection.InsertOne(helper.GetContext(), model)
 	if err != nil {
 		return entity.Model{}, err

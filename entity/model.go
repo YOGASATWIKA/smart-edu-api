@@ -11,7 +11,7 @@ import (
 )
 
 type Model struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id"`
 	Model     string             `json:"model" bson:"model"`
 	Status    string             `json:"status" bson:"status"`
 	CreatedAt time.Time          `json:"created_at" bson:"created_at"`

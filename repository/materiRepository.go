@@ -15,13 +15,13 @@ import (
 //========================================================MATERI POKOK=======================================================================
 
 // CreateMateriPokok creates a new MateriPokok in the database
-func CreateMateriPokok(baseMateri entity.Materi) (entity.Materi, error) {
+func CreateMateriPokok(baseMateri entity.MateriPokok) (entity.MateriPokok, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("skb")
+	collection := client.Database("smart_edu").Collection("materi_pokok")
 	baseMateri.ID = primitive.NewObjectID()
 	_, err := collection.InsertOne(helper.GetContext(), baseMateri)
 	if err != nil {
-		return entity.Materi{}, err
+		return entity.MateriPokok{}, err
 	}
 	return baseMateri, nil
 }
@@ -29,7 +29,7 @@ func CreateMateriPokok(baseMateri entity.Materi) (entity.Materi, error) {
 // GetAllMateriPokok retrieves all MateriPokok from the database
 func GetAllMateriPokok() ([]respond.GetMateriPokokResponse, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("skb")
+	collection := client.Database("smart_edu").Collection("materi_pokok")
 
 	var results []respond.GetMateriPokokResponse
 
@@ -49,9 +49,9 @@ func GetAllMateriPokok() ([]respond.GetMateriPokokResponse, error) {
 }
 
 // GetMateriPokokByID retrieves a MateriPokok by its ID from the database
-func GetMateriPokokByID(id string) (*entity.Materi, error) {
+func GetMateriPokokByID(id string) (*entity.MateriPokok, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("skb")
+	collection := client.Database("smart_edu").Collection("materi_pokok")
 
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -59,7 +59,7 @@ func GetMateriPokokByID(id string) (*entity.Materi, error) {
 	}
 
 	filter := bson.M{"_id": objectID}
-	var materi entity.Materi
+	var materi entity.MateriPokok
 	err = collection.FindOne(helper.GetContext(), filter).Decode(&materi)
 	if err != nil {
 		return nil, err
@@ -67,15 +67,9 @@ func GetMateriPokokByID(id string) (*entity.Materi, error) {
 	return &materi, nil
 }
 
-//========================================================OUTLINE
-
-//========================================================FULL MATERI
-
-//========================================================GENERAL
-
-func DeleteMateri(materi *entity.Materi) (*entity.Materi, error) {
+func DeleteMateri(materi *entity.MateriPokok) (*entity.MateriPokok, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("skb")
+	collection := client.Database("smart_edu").Collection("materi_pokok")
 
 	filter := bson.M{"_id": materi.ID}
 	update := bson.M{"$set": materi}

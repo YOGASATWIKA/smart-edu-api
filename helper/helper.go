@@ -24,7 +24,7 @@ func IsNameExists(Name string) (bool, error) {
 	collection := client.Database("smart_edu").Collection("skb")
 	filter := bson.M{"nama_jabatan": Name, "status": bson.M{"$ne": "DELETED"}}
 
-	var result entity.Materi
+	var result entity.MateriPokok
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

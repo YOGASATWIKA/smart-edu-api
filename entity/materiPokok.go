@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Materi struct {
-	ID           primitive.ObjectID `json:"id" bson:"_id"`
+type MateriPokok struct {
+	ID           primitive.ObjectID `json:"_id" bson:"_id"`
 	Namajabatan  string             `json:"nama_jabatan" bson:"nama_jabatan"`
 	Tugasjabatan []string           `json:"tugas_jabatan" bson:"tugas_jabatan"`
 	Keterampilan []string           `json:"keterampilan" bson:"keterampilan"`

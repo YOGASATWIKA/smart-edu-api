@@ -8,7 +8,7 @@ import (
 
 func GetOutlineById(c *fiber.Ctx) error {
 	id := c.Params("id") // ambil ID dari path parameter
-	existing, err := repository.GetOutlineById(id)
+	existing, err := repository.GetOutlineByMateriPokokId(id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Outline tidak ditemukan",

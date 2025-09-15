@@ -33,7 +33,7 @@ func CreateMateriPokok(c *fiber.Ctx) error {
 		})
 	}
 
-	materiPokok, err := repository.CreateMateriPokok(entity.Materi{
+	materiPokok, err := repository.CreateMateriPokok(entity.MateriPokok{
 		Namajabatan:  request.Namajabatan,
 		Tugasjabatan: request.Tugasjabatan,
 		Keterampilan: request.Keterampilan,

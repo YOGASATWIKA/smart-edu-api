@@ -32,6 +32,7 @@ func main() {
 	controllers.RouteModel(app)
 	controllers.RouteMateriPokok(app)
 	controllers.RouteOutline(app)
+	controllers.RouteMateri(app)
 
 	port := os.Getenv("PORT")
 

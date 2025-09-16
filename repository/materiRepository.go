@@ -3,55 +3,27 @@ package repository
 import (
 	"context"
 	"smart-edu-api/config"
-	respond "smart-edu-api/data/baseMateri/response"
 	"smart-edu-api/entity"
 	"smart-edu-api/helper"
-	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//========================================================MATERI POKOK=======================================================================
-
-// CreateMateriPokok creates a new MateriPokok in the database
-func CreateMateriPokok(baseMateri entity.MateriPokok) (entity.MateriPokok, error) {
+func CreateMateri(ctx context.Context, ebook entity.Ebook) error {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("materi_pokok")
-	baseMateri.ID = primitive.NewObjectID()
-	_, err := collection.InsertOne(helper.GetContext(), baseMateri)
+	collection := client.Database("smart_edu").Collection("materi")
+	_, err := collection.InsertOne(ctx, ebook)
 	if err != nil {
-		return entity.MateriPokok{}, err
+		return err
 	}
-	return baseMateri, nil
+	return nil
 }
 
-// GetAllMateriPokok retrieves all MateriPokok from the database
-func GetAllMateriPokok() ([]respond.GetMateriPokokResponse, error) {
+func GetFullMateriById(id string) (*entity.Ebook, error) {
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("materi_pokok")
-
-	var results []respond.GetMateriPokokResponse
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	filter := bson.M{"status": bson.M{"$ne": "DELETED"}}
-	cursor, err := collection.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(ctx)
-
-	if err := cursor.All(ctx, &results); err != nil {
-		return nil, err
-	}
-	return results, nil
-}
-
-// GetMateriPokokByID retrieves a MateriPokok by its ID from the database
-func GetMateriPokokByID(id string) (*entity.MateriPokok, error) {
-	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("materi_pokok")
+	collection := client.Database("smart_edu").Collection("materi")
 
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -59,7 +31,7 @@ func GetMateriPokokByID(id string) (*entity.MateriPokok, error) {
 	}
 
 	filter := bson.M{"_id": objectID}
-	var materi entity.MateriPokok
+	var materi entity.Ebook
 	err = collection.FindOne(helper.GetContext(), filter).Decode(&materi)
 	if err != nil {
 		return nil, err
@@ -67,16 +39,28 @@ func GetMateriPokokByID(id string) (*entity.MateriPokok, error) {
 	return &materi, nil
 }
 
-func DeleteMateri(materi *entity.MateriPokok) (*entity.MateriPokok, error) {
+func UpdateMateri(ebook *entity.Ebook) (*entity.Ebook, error) {
+
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("materi_pokok")
+	collection := client.Database("smart_edu").Collection("materi")
 
-	filter := bson.M{"_id": materi.ID}
-	update := bson.M{"$set": materi}
+	filter := bson.M{"_id": ebook.ID}
+	update := bson.M{"$set": ebook}
 
-	_, err := collection.UpdateOne(helper.GetContext(), filter, update)
+	opts := options.Update().SetUpsert(true)
+	_, err := collection.UpdateOne(helper.GetContext(), filter, update, opts)
 	if err != nil {
 		return nil, err
 	}
-	return materi, nil
+	return ebook, nil
+}
+
+func CreateLog(ctx context.Context, ebook *entity.Ebook) error {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("materi_log")
+	_, err := collection.InsertOne(ctx, ebook)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -40,7 +40,8 @@ func CreateOutline(app *fiber.Ctx) error {
 		log.Printf("Starting background process for Jabatan: %s", materiPokok.Namajabatan)
 
 		APIKEY := os.Getenv("API_KEY")
-		model := llm.New(ctx, APIKEY, req.Model)
+		//model := llm.New(ctx, APIKEY, req.Model)
+		model := llm.New(ctx, APIKEY)
 		o := generator.New(model)
 
 		otln, err := o.Generate(ctx, generator.Params{
@@ -70,6 +71,7 @@ func CreateOutline(app *fiber.Ctx) error {
 			ID:          primitive.NewObjectID(),
 			MateriPokok: res,
 			Outline:     otln,
+			Model:       req.Model,
 			CreatedAt:   helper.GetCurrentTime(),
 		})
 		if err != nil {

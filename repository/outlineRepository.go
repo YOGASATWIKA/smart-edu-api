@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func GetOutlineByMateriPokokId(id string) (*entity.Outline, error) {
+func GetOutlineByMateriPokokId(ctx context.Context, id string) (*entity.Outline, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("outline")
 
@@ -22,7 +22,7 @@ func GetOutlineByMateriPokokId(id string) (*entity.Outline, error) {
 
 	filter := bson.M{"materi_pokok._id": objectID}
 	var materi entity.Outline
-	err = collection.FindOne(helper.GetContext(), filter).Decode(&materi)
+	err = collection.FindOne(ctx, filter).Decode(&materi)
 	if err != nil {
 		return nil, err
 	}

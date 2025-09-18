@@ -21,7 +21,7 @@ func CreateMateri(ctx context.Context, ebook entity.Ebook) error {
 	return nil
 }
 
-func GetFullMateriById(id string) (*entity.Ebook, error) {
+func GetFullMateriById(ctx context.Context, id string) (*entity.Ebook, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("materi")
 
@@ -55,7 +55,7 @@ func UpdateMateri(ebook *entity.Ebook) (*entity.Ebook, error) {
 	return ebook, nil
 }
 
-func CreateLog(ctx context.Context, ebook *entity.Ebook) error {
+func CreateLog(ctx context.Context, ebook entity.Ebook) error {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("materi_log")
 	_, err := collection.InsertOne(ctx, ebook)

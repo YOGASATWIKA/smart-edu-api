@@ -1,6 +1,7 @@
 package query
 
 import (
+	"smart-edu-api/helper"
 	"smart-edu-api/repository"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +9,8 @@ import (
 
 func GetMateriById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	existing, err := repository.GetFullMateriById(id)
+	ctx := helper.GetContext()
+	existing, err := repository.GetFullMateriById(ctx, id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Outline tidak ditemukan",

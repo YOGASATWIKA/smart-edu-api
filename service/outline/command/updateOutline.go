@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"smart-edu-api/data/outline"
 	"smart-edu-api/helper"
 	"smart-edu-api/repository"
@@ -14,8 +15,9 @@ func UpdateOutline(app *fiber.Ctx) error {
 	godotenv.Load()
 	// ambil ID dari path parameter
 	id := app.Params("id")
+	ctx := context.Background()
 	// Check if outline exists
-	currentOutline, err := repository.GetOutlineByMateriPokokId(id)
+	currentOutline, err := repository.GetOutlineByMateriPokokId(ctx, id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Outline tidak ditemukan",

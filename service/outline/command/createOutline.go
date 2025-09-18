@@ -16,12 +16,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/tmc/langchaingo/llms"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func CreateOutline(app *fiber.Ctx) error {
 	id := app.Params("id")
-
 	var req request.ModelRequest
 	if err := app.BodyParser(&req); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -38,10 +38,13 @@ func CreateOutline(app *fiber.Ctx) error {
 	go func() {
 		ctx := context.Background()
 		log.Printf("Starting background process for Jabatan: %s", materiPokok.Namajabatan)
-
 		APIKEY := os.Getenv("API_KEY")
-		//model := llm.New(ctx, APIKEY, req.Model)
-		model := llm.New(ctx, APIKEY)
+		var model llms.Model
+		if req.Model == "DEFAULT" {
+			model = llm.NewDefault(ctx, APIKEY)
+		} else {
+			model = llm.NewModel(APIKEY, req.Model)
+		}
 		o := generator.New(model)
 
 		otln, err := o.Generate(ctx, generator.Params{

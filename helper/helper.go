@@ -3,7 +3,7 @@ package helper
 import (
 	"context"
 	"smart-edu-api/config"
-	"smart-edu-api/entity"
+	"smart-edu-api/embeded"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,7 +24,7 @@ func IsNameExists(Name string) (bool, error) {
 	collection := client.Database("smart_edu").Collection("skb")
 	filter := bson.M{"nama_jabatan": Name, "status": bson.M{"$ne": "DELETED"}}
 
-	var result entity.MateriPokok
+	var result embeded.MateriPokok
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

@@ -8,23 +8,22 @@ import (
 	"smart-edu-api/config"
 	"smart-edu-api/data/model/request"
 	"smart-edu-api/entity"
-	"smart-edu-api/generator/materi/genai/background_urgency"
-	"smart-edu-api/generator/materi/genai/base_competency"
-	"smart-edu-api/generator/materi/genai/base_material"
-	"smart-edu-api/generator/materi/genai/summary"
-	"smart-edu-api/generator/materi/process/p1"
-	"smart-edu-api/generator/materi/process/p2"
-	"smart-edu-api/generator/materi/process/p3"
-	"smart-edu-api/generator/materi/process/p4"
 	"smart-edu-api/helper"
 	"smart-edu-api/llm"
 	"smart-edu-api/repository"
+	"smart-edu-api/service/generator/materi/genai/background_urgency"
+	"smart-edu-api/service/generator/materi/genai/base_competency"
+	"smart-edu-api/service/generator/materi/genai/base_material"
+	"smart-edu-api/service/generator/materi/genai/summary"
+	"smart-edu-api/service/generator/materi/process/p1"
+	"smart-edu-api/service/generator/materi/process/p2"
+	"smart-edu-api/service/generator/materi/process/p3"
+	"smart-edu-api/service/generator/materi/process/p4"
 	"strings"
 	"sync"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 	"github.com/tmc/langchaingo/llms"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -37,7 +36,6 @@ type Process struct {
 }
 
 func CreateFullMateri(app *fiber.Ctx) error {
-	godotenv.Load()
 	var model llms.Model
 	ctx := context.Background()
 
@@ -68,6 +66,8 @@ func CreateFullMateri(app *fiber.Ctx) error {
 
 	lists := make([]entity.Outline, 0)
 	chOutline := make(chan *entity.Outline)
+
+	//Load Data
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("outline")
 
@@ -102,6 +102,7 @@ func CreateFullMateri(app *fiber.Ctx) error {
 		lists = append(lists, outlineRoot)
 	}
 
+	//end Load data
 	go func() {
 		for _, outline := range lists {
 			fmt.Println("Job Jabatan: ", outline.MateriPokok.Namajabatan, " Started")
@@ -123,10 +124,10 @@ func CreateFullMateri(app *fiber.Ctx) error {
 			Type:      "-",
 			CreatedAt: helper.GetCurrentTime(),
 		})
-		fmt.Println(fmt.Sprintf("Done : %s", ebook.Title))
+		log.Printf(fmt.Sprintf("Done : %s", ebook.Title))
 	}
 	return app.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Outline created successfully",
+		"message": "Request accepted. Outline generation is processing in the background.",
 	})
 
 }

@@ -37,10 +37,10 @@ func GetMongoClient() *mongo.Client {
 	return mongoClient
 }
 
-//func GetMongoDBConnectionString() string {
-//	conn := os.Getenv("MONGODB_CONNECTION_STRING")
-//	if conn == "" {
-//		return "mongodb://localhost:27017"
-//	}
-//	return conn
-//}
+func GetMongoDBConnectionString() string {
+	conn := os.Getenv("MONGODB_CONNECTION_STRING")
+	if conn == "" {
+		return "mongodb://localhost:27017"
+	}
+	return conn
+}

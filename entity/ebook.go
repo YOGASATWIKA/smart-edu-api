@@ -14,7 +14,7 @@ type Ebook struct {
 	Title     string             `json:"title" bson:"title"`
 	Parts     []*Part            `json:"parts" bson:"parts"`
 	Lock      *sync.Mutex        `json:"-" bson:"lock"`
-	Type      string             `json:"type" bson:"type"`
+	ModuleId  primitive.ObjectID `json:"modul" bson:"modul"`
 	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
 	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
 	DeleteAt  time.Time          `json:"delete_at" bson:"delete_at,omitempty"`

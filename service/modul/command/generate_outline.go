@@ -41,29 +41,37 @@ func GenerateOutline(app *fiber.Ctx) error {
 	materiPokok := loadData(request.Id, mongo)
 	ch := make(chan *entity.Modul)
 
+	// ...
 	go func() {
 		defer close(ch)
 		for _, j := range materiPokok {
-			ch <- &entity.Modul{} //need Confirm
+			ch <- &j
 			log.Println("Spawn process for", j.MateriPokok.Namajabatan)
 		}
 	}()
+	// ...
 
-	ch1 := RunGenerateOutlineWithWorker(request.Model, ctx, ch, 4)
+	ch1 := RunGenerateOutlineWithWorker(request.Model, ctx, ch, 3)
 
 	for job := range ch1 {
-		err = repository.GenerateOutline(ctx, entity.Modul{
-			ID:          primitive.NewObjectID(),
+
+		modul := entity.Modul{
+			ID:          job.ID,
 			MateriPokok: job.MateriPokok,
 			Outline:     job.Outline,
-			CreatedAt:   helper.GetCurrentTime(),
-		})
+			Status:      job.Status,
+			State:       "OUTLINE",
+			CreatedAt:   job.CreatedAt,
+			UpdatedAt:   helper.GetCurrentTime(),
+		}
+		updated, err := repository.UpdateModul(ctx, modul)
 		if err != nil {
-			log.Printf("ERROR: Failed to save outline for %s: %v", job.MateriPokok.Namajabatan, err)
+			log.Printf("ERROR: Failed to save outline for %s: %v", updated.MateriPokok.Namajabatan, err)
 			return nil
 		}
-		log.Printf("Successfully processed and saved outline for: %s", job.MateriPokok.Namajabatan)
+		log.Printf("Successfully processed and saved outline for: %s", updated.MateriPokok.Namajabatan)
 	}
+
 	return app.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Request accepted. Outline generation is processing in the background.",
 	})
@@ -188,7 +196,7 @@ func loadData(id []string, db *config.Database) []entity.Modul {
 		}},
 	}
 	ctx := context.Background()
-	collection := db.Conn.Database("smart_edu").Collection("materi_pokok")
+	collection := db.Conn.Database("smart_edu").Collection("modul")
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		return []entity.Modul{}

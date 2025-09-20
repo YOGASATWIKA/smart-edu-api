@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"smart-edu-api/data/model/request"
@@ -26,13 +26,13 @@ func CreateModel(app *fiber.Ctx) error {
 		})
 	}
 
-	promt, errCreatePromt := repository.CreateModel(entity.Model{
+	model, err := repository.CreateModel(entity.Model{
 		ID:        primitive.NewObjectID(),
 		Model:     request.Model,
 		Status:    "ACTIVE",
 		CreatedAt: helper.GetCurrentTime(),
 	})
-	if errCreatePromt != nil {
+	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).
 			JSON(map[string]any{
 				"message": "server error",
@@ -41,7 +41,7 @@ func CreateModel(app *fiber.Ctx) error {
 
 	return app.Status(fiber.StatusOK).JSON(
 		map[string]any{
-			"data":    promt,
+			"data":    model,
 			"message": "Model created successfully",
 		},
 	)

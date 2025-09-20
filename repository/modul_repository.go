@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"smart-edu-api/config"
-	"smart-edu-api/data/modul/response"
+	modul "smart-edu-api/data/modul/response"
 	"smart-edu-api/entity"
 	"smart-edu-api/helper"
 	"time"
@@ -12,33 +12,34 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func CreateModul(baseMateri entity.Modul) (entity.Modul, error) {
+func CreateModul(modul entity.Modul) (entity.Modul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")
-	baseMateri.ID = primitive.NewObjectID()
-	_, err := collection.InsertOne(helper.GetContext(), baseMateri)
+	modul.ID = primitive.NewObjectID()
+	_, err := collection.InsertOne(helper.GetContext(), modul)
 	if err != nil {
 		return entity.Modul{}, err
 	}
-	return baseMateri, nil
+	return modul, nil
 }
 
-func GenerateOutline(ctx context.Context, modul entity.Modul) error {
+func UpdateModul(ctx context.Context, modul entity.Modul) (entity.Modul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")
-	_, err := collection.InsertOne(ctx, modul)
+	filter := bson.M{"_id": modul.ID}
+	update := bson.M{"$set": modul}
+	_, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return err
+		return modul, err
 	}
-
-	return nil
+	return modul, nil
 }
 
-func GetAllModul() ([]response.GetAllModul, error) {
+func GetAllModul() ([]modul.GetAllModul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")
 
-	var results []response.GetAllModul
+	var results []modul.GetAllModul
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -55,21 +56,18 @@ func GetAllModul() ([]response.GetAllModul, error) {
 	return results, nil
 }
 
-//
-//func GetOutlineByMateriPokokId(ctx context.Context, id string) (*entity.Outline, error) {
-//	client := config.GetMongoClient()
-//	collection := client.Database("smart_edu").Collection("outline")
-//
-//	objectID, err := primitive.ObjectIDFromHex(id)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	filter := bson.M{"materi_pokok._id": objectID}
-//	var materi entity.Outline
-//	err = collection.FindOne(ctx, filter).Decode(&materi)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return &materi, nil
-//}
+func GetModulById(id string) (entity.Modul, error) {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("modul")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return entity.Modul{}, err
+	}
+	filter := bson.M{"_id": objectID}
+	var modul entity.Modul
+	err = collection.FindOne(helper.GetContext(), filter).Decode(&modul)
+	if err != nil {
+		return modul, err
+	}
+	return modul, nil
+}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"smart-edu-api/embeded"
 	"smart-edu-api/entity"
 	base_material2 "smart-edu-api/service/generator/materi/genai/base_material"
 )
@@ -13,10 +12,10 @@ type Fetch struct {
 	Generator *base_material2.BaseMaterial
 	ctx       context.Context
 	ebook     *entity.Ebook
-	Outline   *entity.Outline
+	Outline   *entity.Modul
 }
 
-func NewFetch(gen *base_material2.BaseMaterial, outline *entity.Outline) *Fetch {
+func NewFetch(gen *base_material2.BaseMaterial, outline *entity.Modul) *Fetch {
 	return &Fetch{
 		Generator: gen,
 		Outline:   outline,
@@ -41,7 +40,7 @@ func (f *Fetch) Fetch(ctx context.Context, ebook *entity.Ebook) error {
 	return nil
 }
 
-func (f *Fetch) fetchSubMateri(ctx context.Context, m *embeded.MateriPokok, mp string, part *entity.Part) error {
+func (f *Fetch) fetchSubMateri(ctx context.Context, m *entity.Materi, mp string, part *entity.Part) error {
 	for _, listSubMateri := range m.ListSubMateri {
 		log.Println("[2_fetchSubMaterial] Fetching sub material :", listSubMateri)
 		var chapter = &entity.Chapter{
@@ -59,7 +58,7 @@ func (f *Fetch) fetchSubMateri(ctx context.Context, m *embeded.MateriPokok, mp s
 	return nil
 }
 
-func (f *Fetch) fetchListMateri(ctx context.Context, s *embeded.SubMateriPokok, mp, smp string, chapter *entity.Chapter) error {
+func (f *Fetch) fetchListMateri(ctx context.Context, s *entity.SubMateriPokok, mp, smp string, chapter *entity.Chapter) error {
 	for _, materi := range s.ListMateri {
 		log.Println("[3_fetchListMaterial] Fetching material :", materi)
 		var g = &entity.Material{

@@ -43,7 +43,31 @@ func GetAllModul() ([]modul.GetAllModul, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	filter := bson.M{"status": bson.M{"$ne": "DELETED"}}
+	filter := bson.M{"status": bson.M{"$ne": "DELETED"}, "state": bson.M{"$ne": "EBOOK"}}
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func GetAllEbook() ([]modul.GetAllModul, error) {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("modul")
+
+	var results []modul.GetAllModul
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	filter := bson.M{
+		"status": bson.M{"$ne": "DELETED"},
+		"state":  bson.M{"$nin": []string{"DRAFT", "OUTLINE"}},
+	}
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err

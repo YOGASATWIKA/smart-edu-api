@@ -19,7 +19,6 @@ import (
 	"smart-edu-api/service/generator/materi/process/p2"
 	"smart-edu-api/service/generator/materi/process/p3"
 	"smart-edu-api/service/generator/materi/process/p4"
-	"strings"
 	"sync"
 
 	"github.com/asaskevich/govalidator"
@@ -35,7 +34,7 @@ type Process struct {
 	Worker int
 }
 
-func CreateFullMateri(app *fiber.Ctx) error {
+func CreateEbook(app *fiber.Ctx) error {
 	var model llms.Model
 	ctx := context.Background()
 
@@ -57,19 +56,19 @@ func CreateFullMateri(app *fiber.Ctx) error {
 	} else {
 		model = llm.NewModel(APIKEY, request.Model)
 	}
-
+	worker := len(request.Id)
+	fmt.Println("make", worker, " worker for generating E-Book")
 	process := Process{
 		Ctx:    ctx,
 		Model:  model,
-		Worker: 5,
+		Worker: worker,
 	}
 
-	lists := make([]entity.Outline, 0)
-	chOutline := make(chan *entity.Outline)
+	lists := make([]entity.Modul, 0)
+	chModul := make(chan *entity.Modul)
 
-	//Load Data
 	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("outline")
+	collection := client.Database("smart_edu").Collection("modul")
 
 	var objectIDs primitive.A
 	for _, idStr := range request.Id {
@@ -94,23 +93,27 @@ func CreateFullMateri(app *fiber.Ctx) error {
 
 	defer cursor.Close(ctx)
 	for cursor.Next(ctx) {
-		outlineRoot := entity.Outline{}
-		err := cursor.Decode(&outlineRoot)
+		modulRoot := entity.Modul{}
+		err := cursor.Decode(&modulRoot)
 		if err != nil {
 			log.Fatal(err)
 		}
-		lists = append(lists, outlineRoot)
+		modulRoot.State = "EBOOK"
+		updated, err := repository.UpdateModul(ctx, modulRoot)
+		if err != nil {
+			log.Printf("ERROR: Failed to save outline for %s: %v", updated.MateriPokok.Namajabatan, err)
+			return nil
+		}
+		lists = append(lists, modulRoot)
 	}
-
-	//end Load data
 	go func() {
 		for _, outline := range lists {
 			fmt.Println("Job Jabatan: ", outline.MateriPokok.Namajabatan, " Started")
-			chOutline <- &outline
+			chModul <- &outline
 		}
 	}()
 
-	c1 := process.Process1WithWorker(chOutline, process.Worker)
+	c1 := process.Process1WithWorker(chModul, process.Worker)
 	c2 := process.ProcessWithWorker(c1, process.Process2, process.Worker)
 	c3 := process.ProcessWithWorker(c2, process.Process3, process.Worker)
 	c4 := process.ProcessWithWorker(c3, process.Process4, process.Worker)
@@ -120,8 +123,8 @@ func CreateFullMateri(app *fiber.Ctx) error {
 			ID:        primitive.NewObjectID(),
 			Title:     ebook.Title,
 			Parts:     ebook.Parts,
+			ModuleId:  ebook.ModuleId,
 			Lock:      ebook.Lock,
-			Type:      "-",
 			CreatedAt: helper.GetCurrentTime(),
 		})
 		log.Printf(fmt.Sprintf("Done : %s", ebook.Title))
@@ -132,7 +135,7 @@ func CreateFullMateri(app *fiber.Ctx) error {
 
 }
 
-func (p *Process) Process1WithWorker(chOutline <-chan *entity.Outline, worker int) <-chan *entity.Ebook {
+func (p *Process) Process1WithWorker(chModul <-chan *entity.Modul, worker int) <-chan *entity.Ebook {
 
 	out := make(chan *entity.Ebook)
 	wg := &sync.WaitGroup{}
@@ -144,7 +147,7 @@ func (p *Process) Process1WithWorker(chOutline <-chan *entity.Outline, worker in
 	var listWk []<-chan *entity.Ebook
 	wg.Add(worker)
 	for i := 0; i < worker; i++ {
-		listWk = append(listWk, p.Process1(chOutline))
+		listWk = append(listWk, p.Process1(chModul))
 	}
 
 	go func() {
@@ -189,7 +192,7 @@ func (p *Process) ProcessWithWorker(in <-chan *entity.Ebook, process func(in <-c
 
 }
 
-func (p *Process) Process1(in <-chan *entity.Outline) <-chan *entity.Ebook {
+func (p *Process) Process1(in <-chan *entity.Modul) <-chan *entity.Ebook {
 	out := make(chan *entity.Ebook)
 	go func(ctx context.Context) {
 
@@ -217,9 +220,9 @@ func (p *Process) Process1(in <-chan *entity.Outline) <-chan *entity.Ebook {
 
 				ebook := &entity.Ebook{
 
-					Title: outline.MateriPokok.Namajabatan,
-
-					Lock: &sync.Mutex{},
+					Title:    outline.MateriPokok.Namajabatan,
+					ModuleId: outline.ID,
+					Lock:     &sync.Mutex{},
 				}
 
 				fetch := p1.NewFetch(gen, outline)
@@ -235,13 +238,11 @@ func (p *Process) Process1(in <-chan *entity.Outline) <-chan *entity.Ebook {
 
 					ID: primitive.NewObjectID(),
 
-					Title: ebook.Title,
-
-					Parts: ebook.Parts,
+					Title:    ebook.Title,
+					ModuleId: outline.ID,
+					Parts:    ebook.Parts,
 
 					Lock: ebook.Lock,
-
-					Type: fmt.Sprintf("%s.1", strings.ReplaceAll(outline.MateriPokok.Namajabatan, "/", "|")),
 
 					CreatedAt: helper.GetCurrentTime(),
 				})
@@ -302,9 +303,9 @@ func (p *Process) Process2(in <-chan *entity.Ebook) <-chan *entity.Ebook {
 				err := repository.CreateLog(ctx, entity.Ebook{
 					ID:        primitive.NewObjectID(),
 					Title:     ebook.Title,
+					ModuleId:  ebook.ID,
 					Parts:     ebook.Parts,
 					Lock:      ebook.Lock,
-					Type:      fmt.Sprintf("%s.2", strings.ReplaceAll(ebook.Title, "/", "|")),
 					CreatedAt: helper.GetCurrentTime(),
 				})
 
@@ -361,13 +362,11 @@ func (p *Process) Process3(in <-chan *entity.Ebook) <-chan *entity.Ebook {
 
 					ID: primitive.NewObjectID(),
 
-					Title: ebook.Title,
-
-					Parts: ebook.Parts,
+					Title:    ebook.Title,
+					ModuleId: ebook.ID,
+					Parts:    ebook.Parts,
 
 					Lock: ebook.Lock,
-
-					Type: fmt.Sprintf("%s.3", strings.ReplaceAll(ebook.Title, "/", "|")),
 
 					CreatedAt: helper.GetCurrentTime(),
 				})
@@ -411,9 +410,9 @@ func (p *Process) Process4(in <-chan *entity.Ebook) <-chan *entity.Ebook {
 				err := repository.CreateLog(ctx, entity.Ebook{
 					ID:        primitive.NewObjectID(),
 					Title:     ebook.Title,
+					ModuleId:  ebook.ID,
 					Parts:     ebook.Parts,
 					Lock:      ebook.Lock,
-					Type:      fmt.Sprintf("%s.4", strings.ReplaceAll(ebook.Title, "/", "|")),
 					CreatedAt: helper.GetCurrentTime(),
 				})
 				if err != nil {

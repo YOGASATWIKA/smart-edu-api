@@ -7,10 +7,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetMateriById(c *fiber.Ctx) error {
+func GetEbookById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := helper.GetContext()
-	existing, err := repository.GetFullMateriById(ctx, id)
+	existing, err := repository.GetEbookByModulId(ctx, id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Outline tidak ditemukan",

@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"smart-edu-api/data/model/request"

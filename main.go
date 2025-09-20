@@ -31,7 +31,7 @@ func main() {
 	controllers.RouteAuth(app)
 	controllers.RouteModel(app)
 	controllers.RouteModul(app)
-	controllers.RouteMateri(app)
+	controllers.RouteEbook(app)
 
 	port := os.Getenv("PORT")
 

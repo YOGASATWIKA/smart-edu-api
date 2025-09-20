@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"smart-edu-api/embeded"
+	"smart-edu-api/entity"
 	"time"
 
 	jsonrepair "github.com/RealAlexandreAI/json-repair"
@@ -29,13 +29,13 @@ func New(model llms.Model) *Outliner {
 		model: model,
 	}
 }
-func (o *Outliner) Generate(ctx context.Context, params Params) (embeded.Outline, error) {
+func (o *Outliner) Generate(ctx context.Context, params Params) (entity.Outline, error) {
 	err := prepareLogs()
 	if err != nil {
-		return embeded.Outline{}, err
+		return entity.Outline{}, err
 	}
 
-	var out = embeded.Outline{}
+	var out = entity.Outline{}
 
 	contents := []llms.MessageContent{
 		llms.TextParts(llms.ChatMessageTypeSystem, "Anda adalah pejabat yang memiliki kompetensi dan pengalamaan dalam menyusun materi seleksi kompetensi bidang/teknis untuk jabatan dipemerintahan. Berdasarkan kompetensi dan pengalaman anda, selesaikan tugas berikut"),
@@ -43,13 +43,8 @@ func (o *Outliner) Generate(ctx context.Context, params Params) (embeded.Outline
 
 	continues := []llms.MessageContent{
 		llms.TextParts(llms.ChatMessageTypeHuman, fmt.Sprintf("Apa kompetensi bidang/teknis yang harus dimiliki oleh seseorang dengan\nNama Jabatan: %s \nTugas Jabatan: %s \nKeterampilan: %s\n\nIngat, Kompetensi bidang/teknis dalam seleksi ASN (Aparatur Sipil Negara) merujuk pada kemampuan atau pengetahuan spesifik yang berkaitan langsung dengan tugas dan fungsi jabatan yang dilamar. Kompetensi ini mencakup keterampilan teknis, pengetahuan, dan pengalaman yang diperlukan untuk melaksanakan pekerjaan tertentu secara efektif.", params.NamaJabatan, params.TugasJabatan, params.Keterampilan)),
-		llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Tugas anda adalah: "+
-			"1. Buatkan minimal 5 materi pokok dimana masing-masing materi pokok berisi 5 sub materi pokok"+
-			"2. Pada setiap materi pokok dan sub materi pokok sertakan deskripsi atau penjelasan yang merujuk pada setiap bagian materi pokok atau sub materi pokok tersebut"),
-
-		//llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Buatkan minimal 5 materi pokok dimana masing-masing materi pokok berisi 5 sub materi pokok sertakan deskripsi yang mendetail tentang apa yang harus di perhatikan dalam penyusunan materi_pokok dan sub_materi_pokok."),
-		llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"],\n\t\t\t\t\t\t\"description\":\"\"\n\t\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"description\":\"\"\n\t\t\t}\n\t\t]\n\t }\n"),
-		//llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"]\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t]\n\t }\n"),
+		llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Buatkan minimal 5 materi pokok dimana masing-masing materi pokok berisi 5 sub materi pokok sertakan deskripsi yang mendetail tentang apa yang harus di perhatikan dalam penyusunan materi_pokok dan sub_materi_pokok."),
+		llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"]\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t]\n\t }\n"),
 	}
 
 	var lastResponse *llms.ContentResponse

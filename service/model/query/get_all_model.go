@@ -1,4 +1,4 @@
-package query
+package model
 
 import (
 	"smart-edu-api/repository"
@@ -10,7 +10,7 @@ import (
 func GetModel(c *fiber.Ctx) error {
 	model, err := repository.GetAllModel()
 	if err != nil {
-		logrus.Error("Error while getting promt: ", err.Error())
+		logrus.Error("Error while getting model: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Server error",
 		})

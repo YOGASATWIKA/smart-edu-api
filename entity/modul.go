@@ -10,8 +10,8 @@ type Modul struct {
 	ID          primitive.ObjectID `json:"_id" bson:"_id"`
 	MateriPokok MateriPokok        `json:"materi_pokok" bson:"materi_pokok"`
 	Outline     Outline            `json:"outline,omitempty" bson:"outline,omitempty"`
-	Status      string             `json:"model" bson:"model"`
-	State       string             `json:"model" bson:"model"`
+	Status      string             `json:"status" bson:"status"`
+	State       string             `json:"state" bson:"state"`
 	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
 	UpdatedAt   time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 	DeleteAt    time.Time          `json:"delete_at,omitempty" bson:"delete_at,omitempty"`

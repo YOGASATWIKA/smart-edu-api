@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -79,7 +80,33 @@ func GetAllEbook() ([]modul.GetAllModul, error) {
 	}
 	return results, nil
 }
+func GetActivity() ([]modul.GetAllModul, error) {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("modul")
 
+	var results []modul.GetAllModul
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{
+		"status": bson.M{"$ne": "DELETED"},
+	}
+	findOptions := options.Find()
+	findOptions.SetSort(bson.M{"created_at": -1})
+	findOptions.SetLimit(4)
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
 func GetModulById(id string) (entity.Modul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")

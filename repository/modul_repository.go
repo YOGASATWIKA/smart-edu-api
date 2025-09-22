@@ -36,7 +36,7 @@ func UpdateModul(ctx context.Context, modul entity.Modul) (entity.Modul, error) 
 	return modul, nil
 }
 
-func GetAllModul() ([]modul.GetAllModul, error) {
+func GetAllModul(state string) ([]modul.GetAllModul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")
 
@@ -44,7 +44,13 @@ func GetAllModul() ([]modul.GetAllModul, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	filter := bson.M{"status": bson.M{"$ne": "DELETED"}, "state": bson.M{"$ne": "EBOOK"}}
+	filter := bson.M{"status": bson.M{"$ne": "DELETED"}}
+	switch state {
+	case "DRAFT", "OUTLINE":
+		filter["state"] = state
+	case "ALL":
+		filter["state"] = bson.M{"$in": []string{"DRAFT", "OUTLINE"}}
+	}
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err

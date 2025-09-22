@@ -8,7 +8,9 @@ import (
 )
 
 func GetModul(c *fiber.Ctx) error {
-	baseMateri, err := repository.GetAllModul()
+	stateParam := c.Query("state")
+
+	baseMateri, err := repository.GetAllModul(stateParam)
 	if err != nil {
 		logrus.Error("Error while getting base materi: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

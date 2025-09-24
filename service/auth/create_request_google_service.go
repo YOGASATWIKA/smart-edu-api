@@ -53,13 +53,15 @@ func HandleGoogleLogin(c *fiber.Ctx) error {
 	claims := jwt.MapClaims{
 		"id":    user.ID.Hex(),
 		"email": user.Email,
-		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create token"})
 	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": tokenString})
+	return c.JSON(fiber.Map{
+		"message": "Login successful",
+		"token":   tokenString,
+	})
 }

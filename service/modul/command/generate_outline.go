@@ -41,7 +41,6 @@ func GenerateOutline(app *fiber.Ctx) error {
 	materiPokok := loadData(request.Id, mongo)
 	ch := make(chan *entity.Modul)
 
-	// ...
 	go func() {
 		defer close(ch)
 		for _, j := range materiPokok {
@@ -49,7 +48,6 @@ func GenerateOutline(app *fiber.Ctx) error {
 			log.Println("Spawn process for", j.MateriPokok.Namajabatan)
 		}
 	}()
-	// ...
 
 	ch1 := RunGenerateOutlineWithWorker(request.Model, ctx, ch, 3)
 

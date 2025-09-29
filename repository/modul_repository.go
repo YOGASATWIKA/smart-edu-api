@@ -46,10 +46,12 @@ func GetAllModul(state string) ([]modul.GetAllModul, error) {
 	defer cancel()
 	filter := bson.M{"status": bson.M{"$ne": "DELETED"}}
 	switch state {
-	case "OUTLINE", "EBOOK":
+	case "DRAFT", "OUTLINE", "EBOOK":
 		filter["state"] = state
 	case "ALL":
 		filter["state"] = bson.M{"$in": []string{"OUTLINE", "EBOOK"}}
+	case "MODUL":
+		filter["state"] = bson.M{"$in": []string{"DRAFT", "OUTLINE"}}
 	}
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {

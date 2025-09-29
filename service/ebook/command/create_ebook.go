@@ -98,12 +98,6 @@ func CreateEbook(app *fiber.Ctx) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		modulRoot.State = "EBOOK"
-		updated, err := repository.UpdateModul(ctx, modulRoot)
-		if err != nil {
-			log.Printf("ERROR: Failed to save outline for %s: %v", updated.MateriPokok.Namajabatan, err)
-			return nil
-		}
 		lists = append(lists, modulRoot)
 	}
 	go func() {
@@ -127,6 +121,14 @@ func CreateEbook(app *fiber.Ctx) error {
 			Lock:      ebook.Lock,
 			CreatedAt: helper.GetCurrentTime(),
 		})
+
+		modul, _ := repository.GetModulById(ebook.ModuleId.Hex())
+		modul.State = "EBOOK"
+		updated, err := repository.UpdateModul(ctx, modul)
+		if err != nil {
+			log.Printf("ERROR: Failed to save outline for %s: %v", updated.MateriPokok.Namajabatan, err)
+			return nil
+		}
 		log.Printf(fmt.Sprintf("Done : %s", ebook.Title))
 	}
 	return app.Status(fiber.StatusCreated).JSON(fiber.Map{

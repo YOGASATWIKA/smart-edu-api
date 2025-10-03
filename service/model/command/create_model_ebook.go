@@ -11,8 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func CreateModel(app *fiber.Ctx) error {
-	request := new(request.ModelRequest)
+func CreateModelEbook(app *fiber.Ctx) error {
+	request := new(request.ModelOutlineRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
 			"message": "Invalid request body",
@@ -29,6 +29,7 @@ func CreateModel(app *fiber.Ctx) error {
 	model, err := repository.CreateModel(entity.Model{
 		ID:        primitive.NewObjectID(),
 		Model:     request.Model,
+		Promt:     entity.Promt(request.Promt),
 		Status:    "ACTIVE",
 		CreatedAt: helper.GetCurrentTime(),
 	})

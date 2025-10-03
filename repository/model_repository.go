@@ -47,6 +47,19 @@ func GetModelById(id string) (*entity.Model, error) {
 	return &model, nil
 }
 
+func GetModelByModel(modelRequest string) (*entity.Model, error) {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("models")
+
+	filter := bson.M{"model": modelRequest}
+	var model entity.Model
+	err := collection.FindOne(helper.GetContext(), filter).Decode(&model)
+	if err != nil {
+		return nil, err
+	}
+	return &model, nil
+}
+
 func UpdateModel(model *entity.Model) (*entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")

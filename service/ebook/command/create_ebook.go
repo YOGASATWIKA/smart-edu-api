@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"smart-edu-api/config"
-	"smart-edu-api/data/model/request"
+	"smart-edu-api/data/modul/request"
 	"smart-edu-api/entity"
 	"smart-edu-api/helper"
 	"smart-edu-api/llm"
@@ -38,7 +38,7 @@ func CreateEbook(app *fiber.Ctx) error {
 	var model llms.Model
 	ctx := context.Background()
 
-	request := new(request.ModelRequest)
+	request := new(modul.ModelRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
 			"message": "Invalid request body",
@@ -124,6 +124,7 @@ func CreateEbook(app *fiber.Ctx) error {
 
 		modul, _ := repository.GetModulById(ebook.ModuleId.Hex())
 		modul.State = "EBOOK"
+		modul.UpdatedAt = helper.GetCurrentTime()
 		updated, err := repository.UpdateModul(ctx, modul)
 		if err != nil {
 			log.Printf("ERROR: Failed to save outline for %s: %v", updated.MateriPokok.Namajabatan, err)

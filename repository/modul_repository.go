@@ -101,7 +101,7 @@ func GetActivity() ([]modul.GetAllModul, error) {
 		"status": bson.M{"$ne": "DELETED"},
 	}
 	findOptions := options.Find()
-	findOptions.SetSort(bson.M{"created_at": -1})
+	findOptions.SetSort(bson.M{"updated_at": -1})
 	findOptions.SetLimit(4)
 
 	cursor, err := collection.Find(ctx, filter, findOptions)

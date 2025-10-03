@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"smart-edu-api/config"
-	"smart-edu-api/data/model/request"
+	"smart-edu-api/data/modul/request"
 	"smart-edu-api/entity"
 	"smart-edu-api/helper"
 	"smart-edu-api/llm"
@@ -24,7 +24,7 @@ import (
 )
 
 func GenerateOutline(app *fiber.Ctx) error {
-	request := new(request.ModelRequest)
+	request := new(modul.ModelRequest)
 	ctx := context.Background()
 	if err := app.BodyParser(&request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -138,7 +138,7 @@ func RunGenerateOutline(request string, ctx context.Context, in <-chan *entity.M
 
 				log.Println("Processing job", job.MateriPokok.Namajabatan)
 
-				otln, err := o.Generate(ctx, generator.Params{
+				otln, err := o.Generate(request, ctx, generator.Params{
 					NamaJabatan:  job.MateriPokok.Namajabatan,
 					TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
 					Keterampilan: strings.Join(job.MateriPokok.Keterampilan, ", "),

@@ -1,5 +1,6 @@
 package modul
 
-type ModulRequest struct {
-	State string
+type ModelRequest struct {
+	Model string   `valid:"required"`
+	Id    []string `valid:"required"`
 }

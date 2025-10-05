@@ -1,7 +1,7 @@
 package model
 
 import (
-	"smart-edu-api/data/modul/request"
+	request2 "smart-edu-api/data/model/request"
 	"smart-edu-api/helper"
 	"smart-edu-api/repository"
 
@@ -21,7 +21,7 @@ func UpdateModel(app *fiber.Ctx) error {
 	}
 
 	// Parse dan validasi body request
-	request := new(modul.ModelRequest)
+	request := new(request2.ModelOutlineRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
 			"message": "Invalid request body",

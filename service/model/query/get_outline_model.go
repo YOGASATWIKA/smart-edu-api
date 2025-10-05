@@ -7,8 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GetModel(c *fiber.Ctx) error {
-	model, err := repository.GetAllModel()
+func GetOutlineModel(c *fiber.Ctx) error {
+	model, err := repository.GetOutlineModel()
 	if err != nil {
 		logrus.Error("Error while getting model: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

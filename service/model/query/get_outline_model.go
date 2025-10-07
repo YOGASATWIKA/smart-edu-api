@@ -8,7 +8,9 @@ import (
 )
 
 func GetOutlineModel(c *fiber.Ctx) error {
-	model, err := repository.GetOutlineModel()
+	typeParam := c.Query("type")
+
+	model, err := repository.GetOutlineModel(typeParam)
 	if err != nil {
 		logrus.Error("Error while getting model: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

@@ -117,11 +117,12 @@ func RunGenerateOutline(request string, ctx context.Context, in <-chan *entity.M
 	go func() {
 		defer close(out)
 		var model llms.Model
-		APIKEY := os.Getenv("API_KEY")
+		DEFAULTMODEL := os.Getenv("GEMINI_API_KEY")
+		CUSTOMEMODEL := os.Getenv("OPENAI_API_KEY")
 		if request == "Default" {
-			model = llm.NewDefault(ctx, APIKEY)
+			model = llm.NewDefault(ctx, DEFAULTMODEL)
 		} else {
-			model = llm.NewModel(APIKEY, request)
+			model = llm.NewModel(CUSTOMEMODEL, request)
 		}
 		o := generator.New(model)
 

@@ -23,7 +23,7 @@ func CreateModel(model entity.Model) (entity.Model, error) {
 	return model, nil
 }
 
-func GetOutlineModel() ([]entity.Model, error) {
+func GetOutlineModel(typeParam string) ([]entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")
 
@@ -33,6 +33,12 @@ func GetOutlineModel() ([]entity.Model, error) {
 
 	filter := bson.M{
 		"status": bson.M{"$ne": "DELETED"},
+	}
+	switch typeParam {
+	case "DRAFT", "OUTLINE", "EBOOK":
+		filter["type"] = typeParam
+	case "ALL":
+		filter["type"] = bson.M{"$in": []string{"OUTLINE", "EBOOK"}}
 	}
 	findOptions := options.Find()
 	findOptions.SetSort(bson.M{"updated_at": -1})

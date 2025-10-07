@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func CreateModelOutline(app *fiber.Ctx) error {
+func CreateModel(app *fiber.Ctx) error {
 	request := new(request.ModelOutlineRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{

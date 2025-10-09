@@ -26,6 +26,7 @@ func main() {
 	//cors url to front end
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PATHFE"),
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 	controllers.RouteAuth(app)

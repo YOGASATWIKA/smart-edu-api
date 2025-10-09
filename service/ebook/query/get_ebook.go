@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetEbookById(c *fiber.Ctx) error {
+func GetEbookModuleById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := helper.GetContext()
 	existing, err := repository.GetEbookByModulId(ctx, id)

@@ -10,14 +10,16 @@ import (
 )
 
 type Ebook struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Title     string             `json:"title" bson:"title"`
-	Parts     []*Part            `json:"parts" bson:"parts"`
-	Lock      *sync.Mutex        `json:"-" bson:"lock"`
-	ModuleId  primitive.ObjectID `json:"modul" bson:"modul"`
-	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
-	DeleteAt  time.Time          `json:"delete_at" bson:"delete_at,omitempty"`
+	ID          primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Title       string             `json:"title" bson:"title"`
+	Parts       []*Part            `json:"parts" bson:"parts"`
+	Lock        *sync.Mutex        `json:"-" bson:"lock"`
+	HtmlContent string             `json:"html_content,omitempty" bson:"html_content,omitempty"`
+	JsonContent interface{}        `json:"json_content,omitempty" bson:"json_content,omitempty"`
+	ModuleId    primitive.ObjectID `json:"modul" bson:"modul"`
+	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+	DeleteAt    time.Time          `json:"delete_at" bson:"delete_at,omitempty"`
 }
 
 // Comment: Bab

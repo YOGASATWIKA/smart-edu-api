@@ -114,13 +114,17 @@ func CreateEbook(app *fiber.Ctx) error {
 	c4 := process.ProcessWithWorker(c3, process.Process4, process.Worker)
 
 	for ebook := range c4 {
+
+		htmlContent := helper.TransformEbookToHTML(ebook)
+
 		err = repository.CreateMateri(ctx, entity.Ebook{
-			ID:        primitive.NewObjectID(),
-			Title:     ebook.Title,
-			Parts:     ebook.Parts,
-			ModuleId:  ebook.ModuleId,
-			Lock:      ebook.Lock,
-			CreatedAt: helper.GetCurrentTime(),
+			ID:          primitive.NewObjectID(),
+			Title:       ebook.Title,
+			Parts:       ebook.Parts,
+			HtmlContent: htmlContent,
+			ModuleId:    ebook.ModuleId,
+			Lock:        ebook.Lock,
+			CreatedAt:   helper.GetCurrentTime(),
 		})
 
 		modul, _ := repository.GetModulById(ebook.ModuleId.Hex())

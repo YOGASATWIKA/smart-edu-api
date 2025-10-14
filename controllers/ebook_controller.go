@@ -12,6 +12,7 @@ func RouteEbook(app *fiber.App) {
 	eBook.Post("/", command.CreateEbook)
 	eBook.Get("/:id", query.GetEbookModuleById)
 	eBook.Get("/detail:id", command.GetEbookById)
+	eBook.Get("/pdf/:id", query.DownloadEbookById)
 	eBook.Put("/:id", command.UpdateEbookById)
 
 }

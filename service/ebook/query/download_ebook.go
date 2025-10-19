@@ -44,16 +44,12 @@ func DownloadEbookById(c *fiber.Ctx) error {
 			"message": fmt.Sprintf("Gagal inisialisasi PDF generator: %v", err),
 		})
 	}
-
 	// Buat halaman dari HTML content
 	page := wkhtmltopdf.NewPageReader(strings.NewReader(existing.HtmlContent))
 	page.EnableLocalFileAccess.Set(true)
-	page.HeaderCenter.Set(existing.Title)
 	page.FooterRight.Set("[page]")
 	page.Zoom.Set(1.0)
 	pdfg.AddPage(page)
-
-	// Set margin dan kualitas
 	pdfg.MarginLeft.Set(20)
 	pdfg.MarginRight.Set(20)
 	pdfg.MarginTop.Set(25)
@@ -135,7 +131,6 @@ func DownloadEbookWordById(c *fiber.Ctx) error {
 	titleRun.AddText(existing.Title)
 	doc.AddParagraph().AddRun().AddBreak()
 
-	// Konversi HTML ke Word dengan format dasar
 	addFormattedHTML(doc, existing.HtmlContent)
 
 	// Simpan file Word
@@ -148,7 +143,6 @@ func DownloadEbookWordById(c *fiber.Ctx) error {
 	return c.Download(filePath, safeName+".docx")
 }
 
-// 🧩 Fungsi konversi HTML ke format DOCX (tanpa tag)
 func addFormattedHTML(doc *document.Document, html string) {
 	reader := strings.NewReader(html)
 	dom, err := goquery.NewDocumentFromReader(reader)

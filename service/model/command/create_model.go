@@ -27,12 +27,13 @@ func CreateModel(app *fiber.Ctx) error {
 	}
 
 	model, err := repository.CreateModel(entity.Model{
-		ID:        primitive.NewObjectID(),
-		Model:     request.Model,
-		Promt:     entity.Promt(request.Promt),
-		Type:      "OUTLINE",
-		Status:    "ACTIVE",
-		CreatedAt: helper.GetCurrentTime(),
+		ID:          primitive.NewObjectID(),
+		Model:       request.Model,
+		Description: request.Description,
+		Steps:       request.Steps,
+		Variables:   request.Variables,
+		CreatedAt:   helper.GetCurrentTime(),
+		IsActive:    request.IsActive,
 	})
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).

@@ -1,4 +1,4 @@
-package model
+package query
 
 import (
 	"smart-edu-api/repository"
@@ -7,10 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GetOutlineModel(c *fiber.Ctx) error {
-	typeParam := c.Query("type")
-
-	model, err := repository.GetOutlineModel(typeParam)
+func GetModels(c *fiber.Ctx) error {
+	model, err := repository.GetModels()
 	if err != nil {
 		logrus.Error("Error while getting model: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

@@ -119,12 +119,14 @@
 package generator
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"html/template"
 	"os"
 	"smart-edu-api/entity"
+	"smart-edu-api/repository"
 	"strings"
 	"time"
 
@@ -150,59 +152,122 @@ func New(model llms.Model) *Outliner {
 }
 
 // ==================================================================Promt In Code
+//func (o *Outliner) Generate(ctx context.Context, params Params) (entity.Outline, error) {
+//	err := prepareLogs()
+//	if err != nil {
+//		return entity.Outline{}, err
+//	}
+//
+//	var out = entity.Outline{}
+//
+//	contents := []llms.MessageContent{
+//		llms.TextParts(llms.ChatMessageTypeSystem, "Anda adalah pejabat yang memiliki kompetensi dan pengalamaan dalam menyusun materi seleksi kompetensi bidang/teknis untuk jabatan dipemerintahan. Berdasarkan kompetensi dan pengalaman anda, selesaikan tugas berikut"),
+//	}
+//
+//	continues := []llms.MessageContent{
+//		llms.TextParts(llms.ChatMessageTypeHuman, fmt.Sprintf("Apa kompetensi bidang/teknis yang harus dimiliki oleh seseorang dengan\nNama Jabatan: %s \nTugas Jabatan: %s \nKeterampilan: %s\n\nIngat, Kompetensi bidang/teknis dalam seleksi ASN (Aparatur Sipil Negara) merujuk pada kemampuan atau pengetahuan spesifik yang berkaitan langsung dengan tugas dan fungsi jabatan yang dilamar. Kompetensi ini mencakup keterampilan teknis, pengetahuan, dan pengalaman yang diperlukan untuk melaksanakan pekerjaan tertentu secara efektif.", params.NamaJabatan, params.TugasJabatan, params.Keterampilan)),
+//		llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Buatkan minimal 5 materi pokok dimana masing-masing materi pokok berisi 5 sub materi pokok."),
+//		llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"]\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t]\n\t }\n"),
+//	}
+//
+//	var lastResponse *llms.ContentResponse
+//
+//	step := 1
+//
+//	for _, content := range continues {
+//		log.Println(params.NamaJabatan, "generating step", step, "...")
+//		contents = append(contents, content)
+//
+//		res, err := o.model.GenerateContent(ctx, contents, llms.WithJSONMode(), llms.WithMaxTokens(6000))
+//		if err != nil {
+//			return out, err
+//		}
+//
+//		lastResponse = res
+//
+//		contents = append(contents, llms.TextParts(llms.ChatMessageTypeAI, res.Choices[0].Content))
+//		step++
+//	}
+//
+//	if lastResponse == nil {
+//		return out, fmt.Errorf("empty response")
+//	}
+//
+//	clean, err := jsonrepair.RepairJSON(lastResponse.Choices[0].Content)
+//	if err != nil {
+//		return out, err
+//	}
+//
+//	err = json.Unmarshal([]byte(clean), &out)
+//	if err != nil {
+//		return out, err
+//	}
+//
+//	_ = saveLogs(params.NamaJabatan, contents)
+//
+//	return out, nil
+//}
+
 func (o *Outliner) Generate(ctx context.Context, params Params) (entity.Outline, error) {
 	err := prepareLogs()
 	if err != nil {
 		return entity.Outline{}, err
 	}
 
-	var out = entity.Outline{}
+	var out entity.Outline
 
-	contents := []llms.MessageContent{
-		llms.TextParts(llms.ChatMessageTypeSystem, "Anda adalah pejabat yang memiliki kompetensi dan pengalamaan dalam menyusun materi seleksi kompetensi bidang/teknis untuk jabatan dipemerintahan. Berdasarkan kompetensi dan pengalaman anda, selesaikan tugas berikut"),
+	promt, err := repository.GetModelByModel(params.Model)
+	if err != nil {
+		return entity.Outline{}, fmt.Errorf("gagal mendapatkan model prompt dari repository: %w", err)
 	}
 
-	continues := []llms.MessageContent{
-		llms.TextParts(llms.ChatMessageTypeHuman, fmt.Sprintf("Apa kompetensi bidang/teknis yang harus dimiliki oleh seseorang dengan\nNama Jabatan: %s \nTugas Jabatan: %s \nKeterampilan: %s\n\nIngat, Kompetensi bidang/teknis dalam seleksi ASN (Aparatur Sipil Negara) merujuk pada kemampuan atau pengetahuan spesifik yang berkaitan langsung dengan tugas dan fungsi jabatan yang dilamar. Kompetensi ini mencakup keterampilan teknis, pengetahuan, dan pengalaman yang diperlukan untuk melaksanakan pekerjaan tertentu secara efektif.", params.NamaJabatan, params.TugasJabatan, params.Keterampilan)),
-		llms.TextParts(llms.ChatMessageTypeHuman, "Berdasarkan kompetensi bidang/teknis tersebut, apa materi pokok yang perlu dipelajari dan dipahami agar dapat melaksanakan tugas jabatan secara baik dan benar. Buatkan minimal 5 materi pokok dimana masing-masing materi pokok berisi 5 sub materi pokok."),
-		llms.TextParts(llms.ChatMessageTypeHuman, "Buatkan format dalam bentuk JSON sesuai template dibawah\n\n{\n\t\t\"list_materi\": [\n\t\t\t{\n\t\t\t\t\"materi_pokok\": \"\",\n\t\t\t\t\"list_sub_materi\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"sub_materi_pokok\": \"\",\n\t\t\t\t\t\t\"list_materi\": [\"\", \"\"]\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t]\n\t }\n"),
+	data := map[string]string{
+		"NamaJabatan":  params.NamaJabatan,
+		"TugasJabatan": params.TugasJabatan,
+		"Keterampilan": params.Keterampilan,
 	}
 
-	var lastResponse *llms.ContentResponse
-
-	step := 1
-
-	for _, content := range continues {
-		log.Println(params.NamaJabatan, "generating step", step, "...")
-		contents = append(contents, content)
-
-		res, err := o.model.GenerateContent(ctx, contents, llms.WithJSONMode(), llms.WithMaxTokens(6000))
+	var contents []llms.MessageContent
+	for _, step := range promt.Steps {
+		tmpl, err := template.New("prompt").Parse(step.Content)
 		if err != nil {
+			fmt.Println("Error parse template:", err)
+			fmt.Println("Template content:", step.Content)
 			return out, err
 		}
 
-		lastResponse = res
+		var buf bytes.Buffer
+		if err := tmpl.Execute(&buf, data); err != nil {
+			return out, err
+		}
 
-		contents = append(contents, llms.TextParts(llms.ChatMessageTypeAI, res.Choices[0].Content))
-		step++
+		switch step.Role {
+		case "system":
+			contents = append(contents, llms.TextParts(llms.ChatMessageTypeSystem, buf.String()))
+		case "human":
+			contents = append(contents, llms.TextParts(llms.ChatMessageTypeHuman, buf.String()))
+		}
 	}
 
-	if lastResponse == nil {
-		return out, fmt.Errorf("empty response")
-	}
-
-	clean, err := jsonrepair.RepairJSON(lastResponse.Choices[0].Content)
+	res, err := o.model.GenerateContent(ctx, contents, llms.WithJSONMode(), llms.WithMaxTokens(6000))
 	if err != nil {
 		return out, err
 	}
 
-	err = json.Unmarshal([]byte(clean), &out)
+	if len(res.Choices) == 0 {
+		return out, fmt.Errorf("empty response from model")
+	}
+
+	clean, err := jsonrepair.RepairJSON(res.Choices[0].Content)
 	if err != nil {
+		return out, err
+	}
+
+	if err := json.Unmarshal([]byte(clean), &out); err != nil {
 		return out, err
 	}
 
 	_ = saveLogs(params.NamaJabatan, contents)
-
 	return out, nil
 }
 

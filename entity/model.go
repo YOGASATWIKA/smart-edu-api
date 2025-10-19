@@ -7,17 +7,18 @@ import (
 )
 
 type Model struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id"`
-	Model     string             `json:"model" bson:"model"`
-	Promt     Promt              `json:"promt" bson:"promt"`
-	Type      string             `json:"type" bson:"type"`
-	Status    string             `json:"status" bson:"status"`
-	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
-	DeleteAt  time.Time          `json:"delete_at" bson:"delete_at,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Model       string             `json:"model" bson:"model"`
+	Description string             `bson:"description" json:"description"`
+	Steps       []PromptStep       `bson:"steps" json:"steps"`
+	Variables   []string           `bson:"variables" json:"variables"`
+	IsActive    bool               `bson:"is_active" json:"is_active"`
+	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at" bson:"updated_at,omitempty"`
+	DeleteAt    time.Time          `json:"delete_at" bson:"delete_at,omitempty"`
 }
 
-type Promt struct {
-	SystemPrompt string   `json:"system_prompt" bson:"system_prompt"`
-	UserPrompts  []string `json:"user_prompts" bson:"user_prompts"`
+type PromptStep struct {
+	Role    string `bson:"role" json:"role"`
+	Content string `bson:"content" json:"content"`
 }

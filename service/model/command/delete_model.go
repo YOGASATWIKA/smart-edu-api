@@ -17,7 +17,7 @@ func DeleteModel(app *fiber.Ctx) error {
 		})
 	}
 
-	existing.Status = "DELETED"
+	//existing.Status = "DELETED"
 	existing.DeleteAt = helper.GetCurrentTime()
 
 	_, err = repository.UpdateModel(existing)

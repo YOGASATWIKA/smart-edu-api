@@ -27,10 +27,10 @@ func CreateModelEbook(app *fiber.Ctx) error {
 	}
 
 	model, err := repository.CreateModel(entity.Model{
-		ID:        primitive.NewObjectID(),
-		Model:     request.Model,
-		Promt:     entity.Promt(request.Promt),
-		Status:    "ACTIVE",
+		ID:    primitive.NewObjectID(),
+		Model: request.Model,
+		//Promt:     entity.Promt(request.Promt),
+		//Status:    "ACTIVE",
 		CreatedAt: helper.GetCurrentTime(),
 	})
 	if err != nil {

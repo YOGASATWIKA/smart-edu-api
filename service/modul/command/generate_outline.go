@@ -139,17 +139,18 @@ func RunGenerateOutline(request string, ctx context.Context, in <-chan *entity.M
 
 				log.Println("Processing job", job.MateriPokok.Namajabatan)
 
-				otln, err := o.Generate(ctx, generator.Params{
-					NamaJabatan:  job.MateriPokok.Namajabatan,
-					TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
-					Keterampilan: strings.Join(job.MateriPokok.Keterampilan, ", "),
-				})
-
-				//otln, err := o.Generate(request, ctx, generator.Params{
+				//otln, err := o.Generate(ctx, generator.Params{
 				//	NamaJabatan:  job.MateriPokok.Namajabatan,
 				//	TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
 				//	Keterampilan: strings.Join(job.MateriPokok.Keterampilan, ", "),
 				//})
+
+				otln, err := o.Generate(ctx, generator.Params{
+					NamaJabatan:  job.MateriPokok.Namajabatan,
+					TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
+					Keterampilan: strings.Join(job.MateriPokok.Keterampilan, ", "),
+					Model:        request,
+				})
 
 				if err != nil {
 					out <- job

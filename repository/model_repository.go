@@ -23,27 +23,19 @@ func CreateModel(model entity.Model) (entity.Model, error) {
 	return model, nil
 }
 
-func GetOutlineModel(typeParam string) ([]entity.Model, error) {
+func GetModels() ([]entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")
 
 	var results []entity.Model
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	filter := bson.M{
-		"status": bson.M{"$ne": "DELETED"},
-	}
-	switch typeParam {
-	case "DRAFT", "OUTLINE", "EBOOK":
-		filter["type"] = typeParam
-	case "ALL":
-		filter["type"] = bson.M{"$in": []string{"OUTLINE", "EBOOK"}}
-	}
 	findOptions := options.Find()
 	findOptions.SetSort(bson.M{"updated_at": -1})
 
-	cursor, err := collection.Find(ctx, filter, findOptions)
+	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +44,7 @@ func GetOutlineModel(typeParam string) ([]entity.Model, error) {
 	if err := cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
+
 	return results, nil
 }
 
@@ -73,7 +66,7 @@ func GetModelById(id string) (*entity.Model, error) {
 	return &model, nil
 }
 
-func GetModelByModel(modelRequest string) (*entity.Model, error) {
+func GetModelByModel(modelRequest string) (entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")
 
@@ -81,9 +74,9 @@ func GetModelByModel(modelRequest string) (*entity.Model, error) {
 	var model entity.Model
 	err := collection.FindOne(helper.GetContext(), filter).Decode(&model)
 	if err != nil {
-		return nil, err
+		return model, err
 	}
-	return &model, nil
+	return model, nil
 }
 
 func UpdateModel(model *entity.Model) (*entity.Model, error) {

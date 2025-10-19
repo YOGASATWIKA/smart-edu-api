@@ -84,10 +84,6 @@ func DownloadEbookById(c *fiber.Ctx) error {
 			"message": fmt.Sprintf("Gagal menulis file PDF: %v", err),
 		})
 	}
-
-	c.Set("Content-Type", "application/pdf")
-	c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.pdf\"", safeName))
-	c.Set("X-Filename", fmt.Sprintf("%s.pdf", safeName))
 	return c.Download(filePath, safeName+".pdf")
 }
 

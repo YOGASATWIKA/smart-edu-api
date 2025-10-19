@@ -1,10 +1,11 @@
 package request
 
+import "smart-edu-api/entity"
+
 type ModelOutlineRequest struct {
-	Model string `json:"model" valid:"required"`
-	Promt Promt  `json:"promt" valid:"required"`
-}
-type Promt struct {
-	SystemPrompt string   `json:"system_prompt" valid:"required"`
-	UserPrompts  []string `json:"user_prompts" valid:"required"`
+	Model       string              `json:"model" validate:"required"`
+	Description string              `json:"description" validate:"required"`
+	Steps       []entity.PromptStep `json:"steps" validate:"required,dive"`
+	Variables   []string            `json:"variables" validate:"required,dive"`
+	IsActive    bool                `json:"is_active"`
 }

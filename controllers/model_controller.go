@@ -10,7 +10,8 @@ import (
 func RouteModel(app *fiber.App) {
 	modelGroup := app.Group("/model")
 	modelGroup.Post("/", command.CreateModel)
-	modelGroup.Put("/outline/:id", command.UpdateModel)
-	modelGroup.Get("/outline", query.GetOutlineModel)
+	modelGroup.Put("/:id", command.UpdateModel)
+	modelGroup.Get("/", query.GetModels)
+	modelGroup.Get("/:model", query.GetDetailModel)
 	modelGroup.Delete("/:id", command.DeleteModel)
 }

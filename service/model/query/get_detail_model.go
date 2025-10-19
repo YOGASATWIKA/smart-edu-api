@@ -7,9 +7,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GetDetailModule(app *fiber.Ctx) error {
-	id := app.Params("id")
-	res, err := repository.GetModulById(id)
+func GetDetailModel(app *fiber.Ctx) error {
+	model := app.Params("model")
+	res, err := repository.GetModelByModel(model)
 	if err != nil {
 		logrus.Error("Error while getting base materi: ", err.Error())
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

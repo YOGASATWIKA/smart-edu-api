@@ -8,7 +8,8 @@ import (
 )
 
 func GetModels(c *fiber.Ctx) error {
-	model, err := repository.GetModels()
+	status := c.Query("status")
+	model, err := repository.GetModels(status)
 	if err != nil {
 		logrus.Error("Error while getting model: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

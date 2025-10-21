@@ -31,7 +31,7 @@ func CreateModul(c *fiber.Ctx) error {
 	}
 	modul, err := repository.CreateModul(entity.Modul{
 		MateriPokok: MateriPokok,
-		Status:      "ACTIVE",
+		IsActive:    true,
 		State:       "DRAFT",
 		CreatedAt:   helper.GetCurrentTime(),
 	})

@@ -14,6 +14,7 @@ func RouteModul(app *fiber.App) {
 	modulGroup.Get("/", query.GetModul)
 	modulGroup.Get("/activity/", query.GetActivity)
 	modulGroup.Get("/:id", query.GetDetailModule)
+	modulGroup.Delete("/:id", command.DeleteModul)
 
 	modulGroup.Post("/outline", command.GenerateOutline)
 	modulGroup.Put("/outline/:id", command.UpdateOutline)

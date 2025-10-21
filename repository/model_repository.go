@@ -23,7 +23,7 @@ func CreateModel(model entity.Model) (entity.Model, error) {
 	return model, nil
 }
 
-func GetModels() ([]entity.Model, error) {
+func GetModels(status string) ([]entity.Model, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("models")
 
@@ -32,10 +32,20 @@ func GetModels() ([]entity.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	filter := bson.M{}
+
+	switch status {
+	case "ACTIVE":
+		filter["is_active"] = true
+	case "NONACTIVE":
+		filter["is_active"] = false
+	case "ALL":
+	}
+
 	findOptions := options.Find()
 	findOptions.SetSort(bson.M{"updated_at": -1})
 
-	cursor, err := collection.Find(ctx, bson.M{}, findOptions)
+	cursor, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ func GetAllModul(state string) ([]modul.GetAllModul, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	filter := bson.M{"status": bson.M{"$ne": "DELETED"}}
+	filter := bson.M{"is_active": bson.M{"$ne": false}}
 	switch state {
 	case "DRAFT", "OUTLINE", "EBOOK":
 		filter["state"] = state
@@ -74,8 +74,8 @@ func GetAllEbook() ([]modul.GetAllModul, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	filter := bson.M{
-		"status": bson.M{"$ne": "DELETED"},
-		"state":  bson.M{"$nin": []string{"DRAFT", "OUTLINE"}},
+		"is_active": bson.M{"$ne": false},
+		"state":     bson.M{"$nin": []string{"DRAFT", "OUTLINE"}},
 	}
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
@@ -98,7 +98,7 @@ func GetActivity() ([]modul.GetAllModul, error) {
 	defer cancel()
 
 	filter := bson.M{
-		"status": bson.M{"$ne": "DELETED"},
+		"is_active": bson.M{"$ne": false},
 	}
 	findOptions := options.Find()
 	findOptions.SetSort(bson.M{"updated_at": -1})

@@ -57,7 +57,7 @@ func GenerateOutline(app *fiber.Ctx) error {
 			ID:          job.ID,
 			MateriPokok: job.MateriPokok,
 			Outline:     job.Outline,
-			Status:      job.Status,
+			IsActive:    job.IsActive,
 			State:       "OUTLINE",
 			CreatedAt:   job.CreatedAt,
 			UpdatedAt:   helper.GetCurrentTime(),

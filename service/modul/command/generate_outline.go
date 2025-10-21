@@ -35,7 +35,7 @@ func GenerateOutline(app *fiber.Ctx) error {
 
 	mongo, err := config.New(config.GetMongoDBConnectionString())
 	if err != nil {
-		log.Fatal("error connecting to db")
+		log.Fatal("Error While Connecting to MongoDB", err)
 	}
 
 	materiPokok := loadData(request.Id, mongo)
@@ -71,7 +71,7 @@ func GenerateOutline(app *fiber.Ctx) error {
 	}
 
 	return app.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Request accepted. Outline generation is processing in the background.",
+		"message": "Request accepted",
 	})
 }
 
@@ -139,12 +139,6 @@ func RunGenerateOutline(request string, ctx context.Context, in <-chan *entity.M
 
 				log.Println("Processing job", job.MateriPokok.Namajabatan)
 
-				//otln, err := o.Generate(ctx, generator.Params{
-				//	NamaJabatan:  job.MateriPokok.Namajabatan,
-				//	TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
-				//	Keterampilan: strings.Join(job.MateriPokok.Keterampilan, ", "),
-				//})
-
 				otln, err := o.Generate(ctx, generator.Params{
 					NamaJabatan:  job.MateriPokok.Namajabatan,
 					TugasJabatan: strings.Join(job.MateriPokok.Tugasjabatan, ", "),
@@ -158,7 +152,6 @@ func RunGenerateOutline(request string, ctx context.Context, in <-chan *entity.M
 				}
 
 				job.Outline = otln
-				// job.Outline.NamaJabatan = fmt.Sprintf("%s", job.Jabatan.NamaJabatan)
 
 				filename := fmt.Sprintf("./output/%s.json", strings.ReplaceAll(job.MateriPokok.Namajabatan, "/", "|"))
 

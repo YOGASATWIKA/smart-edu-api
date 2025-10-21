@@ -44,7 +44,7 @@ func (o *Outliner) Generate(ctx context.Context, params Params) (entity.Outline,
 
 	promt, err := repository.GetModelByModel(params.Model)
 	if err != nil {
-		return entity.Outline{}, fmt.Errorf("gagal mendapatkan model prompt dari repository: %w", err)
+		return entity.Outline{}, fmt.Errorf("Model Not Found: %w", err)
 	}
 
 	data := map[string]string{
@@ -128,7 +128,6 @@ func saveLogs(name string, contents []llms.MessageContent) error {
 
 	for _, content := range contents {
 		var contentText string
-		// Ambil bagian pertama dari Parts, karena TextParts hanya mengisi satu bagian.
 		if len(content.Parts) > 0 {
 			if partStr, ok := content.Parts[0].(llms.TextContent); ok {
 				contentText = partStr.Text

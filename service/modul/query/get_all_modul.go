@@ -12,7 +12,7 @@ func GetModul(c *fiber.Ctx) error {
 
 	baseMateri, err := repository.GetAllModul(stateParam)
 	if err != nil {
-		logrus.Error("Error while getting base materi: ", err.Error())
+		logrus.Error("Error while getting module: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Server error",
 		})

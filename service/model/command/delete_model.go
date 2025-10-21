@@ -13,21 +13,21 @@ func DeleteModel(app *fiber.Ctx) error {
 	existing, err := repository.GetModelById(id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Promt tidak ditemukan",
+			"message": "Model Not Found",
 		})
 	}
 
-	//existing.Status = "DELETED"
+	existing.IsActive = false
 	existing.DeleteAt = helper.GetCurrentTime()
 
 	_, err = repository.UpdateModel(existing)
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Gagal menghapus model",
+			"message": "Error Deleting Model",
 		})
 	}
 
 	return app.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "model berhasil dihapus (soft delete)",
+		"message": "Model Deleted Successfully",
 	})
 }

@@ -22,7 +22,6 @@ type Ebook struct {
 	DeleteAt    time.Time          `json:"delete_at" bson:"delete_at,omitempty"`
 }
 
-// Comment: Bab
 type Part struct {
 	Subject       string     `json:"subject" bson:"subject"`
 	Introductions []string   `json:"introductions" bson:"introductions"`

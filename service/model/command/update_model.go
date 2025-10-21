@@ -10,17 +10,15 @@ import (
 )
 
 func UpdateModel(app *fiber.Ctx) error {
-	id := app.Params("id") // ambil ID dari path parameter
+	id := app.Params("id")
 
-	// Cek apakah data dengan ID tersebut ada
 	existing, err := repository.GetModelById(id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Model tidak ditemukan",
+			"message": "Model Not Found",
 		})
 	}
 
-	// Parse dan validasi body request
 	request := new(request2.ModelOutlineRequest)
 	if err := app.BodyParser(request); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(map[string]any{
@@ -42,16 +40,15 @@ func UpdateModel(app *fiber.Ctx) error {
 	existing.IsActive = request.IsActive
 	existing.UpdatedAt = helper.GetCurrentTime()
 
-	// Simpan perubahan
 	updated, err := repository.UpdateModel(existing)
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(map[string]any{
-			"message": "Gagal mengupdate data",
+			"message": "Error Updating Model",
 		})
 	}
 
 	return app.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Model berhasil diperbarui",
+		"message": "Update Model Successfully",
 		"data":    updated,
 	})
 }

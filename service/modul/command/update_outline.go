@@ -10,13 +10,12 @@ import (
 )
 
 func UpdateOutline(app *fiber.Ctx) error {
-	id := app.Params("id") // ambil ID dari path parameter
+	id := app.Params("id")
 
-	// Cek apakah data dengan ID tersebut ada
 	existing, err := repository.GetModulById(id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Model tidak ditemukan",
+			"message": "Modul Not Found",
 		})
 	}
 
@@ -39,12 +38,12 @@ func UpdateOutline(app *fiber.Ctx) error {
 	updated, err := repository.UpdateModul(helper.GetContext(), existing)
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(map[string]any{
-			"message": "Gagal mengupdate data",
+			"message": "Error Updating Outline",
 		})
 	}
 
 	return app.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Modul berhasil diperbarui",
+		"message": "Outline Updated Successfully",
 		"data":    updated,
 	})
 }

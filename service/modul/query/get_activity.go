@@ -11,7 +11,7 @@ import (
 func GetActivity(c *fiber.Ctx) error {
 	baseMateri, err := repository.GetActivity()
 	if err != nil {
-		logrus.Error("Error while getting base materi: ", err.Error())
+		logrus.Error("Error while getting activity: ", err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Server error",
 		})

@@ -15,7 +15,7 @@ func DeleteModul(app *fiber.Ctx) error {
 	existing, err := repository.GetModulById(id)
 	if err != nil {
 		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Modul tidak ditemukan",
+			"message": "Module Not Found",
 		})
 	}
 
@@ -25,11 +25,11 @@ func DeleteModul(app *fiber.Ctx) error {
 	_, err = repository.UpdateModul(ctx, existing)
 	if err != nil {
 		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Gagal menghapus model",
+			"message": "Error While Deleting Module",
 		})
 	}
 
 	return app.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "model berhasil dihapus (soft delete)",
+		"message": "Module Deleted Successfully",
 	})
 }

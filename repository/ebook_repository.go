@@ -21,7 +21,7 @@ func CreateMateri(ctx context.Context, ebook entity.Ebook) error {
 	return nil
 }
 
-func GetEbookByModulId(ctx context.Context, id string) (*entity.Ebook, error) {
+func GetEbookByModulId(id string) (*entity.Ebook, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("ebook")
 
@@ -39,7 +39,7 @@ func GetEbookByModulId(ctx context.Context, id string) (*entity.Ebook, error) {
 	return &materi, nil
 }
 
-func UpdateEbookById(ctx context.Context, id string, ebook entity.Ebook) error {
+func UpdateEbookById(id string, ebook entity.Ebook) error {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("ebook")
 
@@ -73,7 +73,7 @@ func CreateLog(ctx context.Context, ebook entity.Ebook) error {
 	return nil
 }
 
-func GetEbookById(ctx context.Context, id string) (*entity.Ebook, error) {
+func GetEbookById(id string) (*entity.Ebook, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("ebook")
 

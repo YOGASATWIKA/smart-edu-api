@@ -65,29 +65,6 @@ func GetAllModul(state string) ([]modul.GetAllModul, error) {
 	return results, nil
 }
 
-func GetAllEbook() ([]modul.GetAllModul, error) {
-	client := config.GetMongoClient()
-	collection := client.Database("smart_edu").Collection("modul")
-
-	var results []modul.GetAllModul
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	filter := bson.M{
-		"is_active": bson.M{"$ne": false},
-		"state":     bson.M{"$nin": []string{"DRAFT", "OUTLINE"}},
-	}
-	cursor, err := collection.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(ctx)
-
-	if err := cursor.All(ctx, &results); err != nil {
-		return nil, err
-	}
-	return results, nil
-}
 func GetActivity() ([]modul.GetAllModul, error) {
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("modul")

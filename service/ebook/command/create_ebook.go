@@ -58,7 +58,6 @@ func CreateEbook(app *fiber.Ctx) error {
 		model = llm.NewModel(APIKEYCUSTOME, request.Model)
 	}
 	worker := len(request.Id)
-	fmt.Println("make", worker, " worker for generating E-Book")
 	process := Process{
 		Ctx:    ctx,
 		Model:  model,

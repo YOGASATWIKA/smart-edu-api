@@ -9,7 +9,7 @@ import (
 
 func GetEbookById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	ebook, err := repository.GetEbookById(c.Context(), id)
+	ebook, err := repository.GetEbookById(id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Ebook tidak ditemukan",
@@ -28,7 +28,7 @@ func UpdateEbookById(c *fiber.Ctx) error {
 		})
 	}
 
-	err := repository.UpdateEbookById(c.Context(), id, ebook)
+	err := repository.UpdateEbookById(id, ebook)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Gagal memperbarui ebook",

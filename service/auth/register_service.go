@@ -3,8 +3,10 @@ package auth
 import (
 	"context"
 	"os"
+	"regexp"
 	"smart-edu-api/config"
 	"smart-edu-api/entity"
+	"smart-edu-api/helper"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -33,9 +35,30 @@ func HandleRegister(c *fiber.Ctx) error {
 		return err
 	}
 
-	if data["name"] == "" || data["email"] == "" || data["password"] == "" {
+	requiredFields := map[string]string{
+		"name":     "Name tidak boleh kosong",
+		"email":    "Email tidak boleh kosong",
+		"password": "Password tidak boleh kosong",
+	}
+
+	for field, message := range requiredFields {
+		if val, ok := data[field]; !ok || val == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": message,
+			})
+		}
+	}
+
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	if !emailRegex.MatchString(data["email"]) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Name, email, and password are required",
+			"message": "Format email tidak valid",
+		})
+	}
+
+	if err := helper.ValidatePassword(data["password"]); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
 		})
 	}
 
@@ -59,7 +82,7 @@ func HandleRegister(c *fiber.Ctx) error {
 	err = collection.FindOne(context.TODO(), bson.M{"email": user.Email}).Decode(&entity.User{})
 	if err == nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"message": "Email already exists",
+			"message": "Email Sudah Terdaftar",
 		})
 	}
 	if err != mongo.ErrNoDocuments {

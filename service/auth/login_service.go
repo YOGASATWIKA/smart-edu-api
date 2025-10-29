@@ -25,6 +25,19 @@ func HandleLogin(c *fiber.Ctx) error {
 		return err
 	}
 
+	requiredFields := map[string]string{
+		"email":    "Email tidak boleh kosong",
+		"password": "Password tidak boleh kosong",
+	}
+
+	for field, message := range requiredFields {
+		if val, ok := data[field]; !ok || val == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": message,
+			})
+		}
+	}
+
 	client := config.GetMongoClient()
 	collection := client.Database("smart_edu").Collection("users")
 
@@ -33,13 +46,13 @@ func HandleLogin(c *fiber.Ctx) error {
 	err := collection.FindOne(context.TODO(), bson.M{"email": data["email"]}).Decode(&user)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Invalid email or password",
+			"message": "Email atau password salah",
 		})
 	}
 
 	if !CheckPasswordHash(data["password"], user.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Invalid email or password",
+			"message": "Email atau password salah",
 		})
 	}
 

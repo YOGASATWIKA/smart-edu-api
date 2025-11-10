@@ -10,7 +10,7 @@ import (
 func RouteModul(app *fiber.App) {
 	modulGroup := app.Group("/modul")
 	modulGroup.Post("/base-materi", command.CreateModul)
-	modulGroup.Post("/base-materi/:id", command.UpdateBaseMateri)
+	modulGroup.Put("/base-materi/:id", command.UpdateBaseMateri)
 	modulGroup.Get("/", query.GetModul)
 	modulGroup.Get("/activity/", query.GetActivity)
 	modulGroup.Get("/:id", query.GetDetailModule)

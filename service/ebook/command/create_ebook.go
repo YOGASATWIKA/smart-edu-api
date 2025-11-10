@@ -50,13 +50,8 @@ func CreateEbook(app *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	APIKEYDEFAULT := os.Getenv("GEMINI_API_KEY")
 	APIKEYCUSTOME := os.Getenv("OPENAI_API_KEY")
-	if request.Model == "Default" {
-		model = llm.NewDefault(ctx, APIKEYDEFAULT)
-	} else {
-		model = llm.NewModel(APIKEYCUSTOME, request.Model)
-	}
+	model = llm.NewModel(APIKEYCUSTOME, request.Model)
 	worker := len(request.Id)
 	process := Process{
 		Ctx:    ctx,

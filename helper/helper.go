@@ -2,10 +2,13 @@ package helper
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"regexp"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetContext() context.Context {
@@ -34,4 +37,17 @@ func ValidatePassword(password string) error {
 	}
 
 	return nil
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func GenerateRandomToken() (string, error) {
+	bytes := make([]byte, 32) // 32 bytes = 64 hex characters
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

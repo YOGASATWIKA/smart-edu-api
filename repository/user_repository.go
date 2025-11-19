@@ -38,3 +38,16 @@ func GetUserById(id string) (*entity.User, error) {
 	}
 	return &user, nil
 }
+
+func GetUserByEmail(email string) (*entity.User, error) {
+	client := config.GetMongoClient()
+	collection := client.Database("smart_edu").Collection("users")
+
+	filter := bson.M{"email": email}
+	var user entity.User
+	err := collection.FindOne(helper.GetContext(), filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

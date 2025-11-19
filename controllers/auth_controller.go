@@ -17,6 +17,8 @@ func RouteAuth(app *fiber.App) {
 	app.Post("/api/auth/google", auth.HandleGoogleLogin)
 	app.Post("/register", auth.HandleRegister)
 	app.Post("/login", auth.HandleLogin)
+	app.Post("/forgot-password", auth.HandleForgotPassword)
+	app.Post("/reset-password", auth.HandleResetPassword)
 	profileGroup := app.Group("/api/profile", auth.AuthenticateToken)
 	profileGroup.Get("/", auth.HandleGetProfile)
 	profileGroup.Put("/", auth.HandleUpdateProfile)

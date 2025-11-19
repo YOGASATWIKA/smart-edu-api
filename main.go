@@ -24,12 +24,21 @@ func main() {
 	config.InitMongoDB()
 	app := fiber.New()
 	//cors url to front end
+	//app.Use(cors.New(cors.Config{
+	//	AllowOrigins:  os.Getenv("PATHFE"),
+	//	AllowMethods:  "GET,POST,PUT,DELETE,OPTIONS",
+	//	AllowHeaders:  "*",
+	//	ExposeHeaders: "Content-Disposition, X-Filename",
+	//}))
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:  os.Getenv("PATHFE"),
-		AllowMethods:  "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders:  "*",
-		ExposeHeaders: "Content-Disposition, X-Filename",
+		AllowOrigins: "https://smart-edu-production.up.railway.app, http://localhost:5173, http://localhost:3000",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
+	app.Options("/*", func(c *fiber.Ctx) error {
+		return c.SendStatus(200)
+	})
 	controllers.RouteAuth(app)
 	controllers.RouteModel(app)
 	controllers.RouteModul(app)

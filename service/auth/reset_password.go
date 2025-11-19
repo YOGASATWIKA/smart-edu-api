@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/smtp"
 	"os"
 	"smart-edu-api/config"
 	"smart-edu-api/entity"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/resend/resend-go/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -69,10 +69,6 @@ func HandleForgotPassword(c *fiber.Ctx) error {
 	})
 }
 func SendResetPasswordEmail(to string, token string) error {
-	smtpHost := "sandbox.smtp.mailtrap.io"
-	smtpPort := "2525"
-	username := "004d4074e2b288"
-	password := "39a24d61bf78ea"
 
 	fePath := os.Getenv("PATHFE")
 	resetLink := fmt.Sprintf("%s/reset-password?token=%s", fePath, token)
@@ -126,9 +122,22 @@ func SendResetPasswordEmail(to string, token string) error {
 			body,
 	)
 
-	auth := smtp.PlainAuth("", username, password, smtpHost)
+	sendmail := os.Getenv("SENDMAILKEY")
+	client := resend.NewClient(sendmail)
 
-	return smtp.SendMail(smtpHost+":"+smtpPort, auth, username, []string{to}, message)
+	params := &resend.SendEmailRequest{
+		From:    "onboarding@resend.dev",
+		To:      []string{to},
+		Subject: subject,
+		Html:    string(message),
+	}
+
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		return fmt.Errorf("gagal mengirim email reset password: %w", err)
+	}
+
+	return nil
 }
 
 func HandleResetPassword(c *fiber.Ctx) error {

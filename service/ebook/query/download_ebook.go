@@ -43,7 +43,6 @@ func DownloadEbookById(c *fiber.Ctx) error {
 
 	// Title
 	pdf.SetFont("Arial", "B", 20)
-	pdf.MultiCell(0, 10, existing.Title, "", "C", false)
 	pdf.Ln(8)
 
 	// BODY

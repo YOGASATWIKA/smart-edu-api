@@ -7,11 +7,11 @@ toolchain go1.24.6
 require (
 	baliance.com/gooxml v1.0.1
 	github.com/PuerkitoBio/goquery v1.10.3
-	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.3
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/cloudinary/cloudinary-go/v2 v2.13.0
 	github.com/gofiber/fiber/v2 v2.52.8
 	github.com/joho/godotenv v1.5.1
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/petermattis/goid v0.0.0-20250904145737-900bdf8bb490
 	github.com/resend/resend-go/v2 v2.28.0
 	github.com/sirupsen/logrus v1.9.3
@@ -50,6 +50,7 @@ require (
 	github.com/yargevad/filepathx v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/net v0.43.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

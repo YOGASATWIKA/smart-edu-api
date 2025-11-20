@@ -8,12 +8,10 @@ import (
 	"smart-edu-api/repository"
 	"strings"
 
-	"baliance.com/gooxml/color"
 	"baliance.com/gooxml/document"
-	"baliance.com/gooxml/schema/soo/wml"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jung-kurt/gofpdf"
 )
 
 func DownloadEbookById(c *fiber.Ctx) error {
@@ -32,47 +30,85 @@ func DownloadEbookById(c *fiber.Ctx) error {
 		})
 	}
 
-	pdfg, err := wkhtmltopdf.NewPDFGenerator()
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(existing.HtmlContent))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": fmt.Sprintf("Error Initialized PDF generator: %v", err),
-		})
-	}
-	page := wkhtmltopdf.NewPageReader(strings.NewReader(existing.HtmlContent))
-	page.EnableLocalFileAccess.Set(true)
-	page.FooterRight.Set("[page]")
-	page.Zoom.Set(1.0)
-	pdfg.AddPage(page)
-	pdfg.MarginLeft.Set(20)
-	pdfg.MarginRight.Set(20)
-	pdfg.MarginTop.Set(25)
-	pdfg.MarginBottom.Set(15)
-	pdfg.Dpi.Set(300)
-
-	if err := pdfg.Create(); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": fmt.Sprintf("Error Loading File: %v", err),
+			"message": fmt.Sprintf("Error parsing HTML: %v", err),
 		})
 	}
 
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetMargins(20, 20, 20)
+	pdf.AddPage()
+
+	// Title
+	pdf.SetFont("Arial", "B", 20)
+	pdf.MultiCell(0, 10, existing.Title, "", "C", false)
+	pdf.Ln(8)
+
+	// BODY
+	renderPDF(doc, pdf)
+
+	// File saving
 	re := regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
 	safeName := re.ReplaceAllString(existing.Title, "_")
 
 	saveDir := "./storage/pdf"
-	if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
+	os.MkdirAll(saveDir, os.ModePerm)
+	filePath := filepath.Join(saveDir, safeName+".pdf")
+
+	if err := pdf.OutputFileAndClose(filePath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": fmt.Sprintf("Error Creating Directory: %v", err),
+			"message": fmt.Sprintf("Error Writing PDF: %v", err),
 		})
 	}
 
-	filePath := filepath.Join(saveDir, fmt.Sprintf("%s.pdf", safeName))
-
-	if err := pdfg.WriteFile(filePath); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": fmt.Sprintf("Error Writing file PDF: %v", err),
-		})
-	}
 	return c.Download(filePath, safeName+".pdf")
+}
+
+func renderPDF(doc *goquery.Document, pdf *gofpdf.Fpdf) {
+	doc.Find("body").Contents().Each(func(i int, s *goquery.Selection) {
+
+		switch goquery.NodeName(s) {
+
+		case "h1":
+			pdf.SetFont("Arial", "B", 18)
+			pdf.MultiCell(0, 10, s.Text(), "", "", false)
+			pdf.Ln(4)
+
+		case "h2":
+			pdf.SetFont("Arial", "B", 16)
+			pdf.MultiCell(0, 9, s.Text(), "", "", false)
+			pdf.Ln(4)
+
+		case "h3":
+			pdf.SetFont("Arial", "B", 14)
+			pdf.MultiCell(0, 8, s.Text(), "", "", false)
+			pdf.Ln(4)
+
+		case "p":
+			pdf.SetFont("Arial", "", 12)
+			pdf.MultiCell(0, 7, s.Text(), "", "", false)
+			pdf.Ln(3)
+
+		case "ul":
+			s.Find("li").Each(func(i int, li *goquery.Selection) {
+				pdf.SetFont("Arial", "", 12)
+				pdf.MultiCell(0, 7, "• "+li.Text(), "", "", false)
+			})
+			pdf.Ln(2)
+
+		case "strong", "b":
+			pdf.SetFont("Arial", "B", 12)
+			pdf.MultiCell(0, 7, s.Text(), "", "", false)
+			pdf.Ln(3)
+
+		case "i", "em":
+			pdf.SetFont("Arial", "I", 12)
+			pdf.MultiCell(0, 7, s.Text(), "", "", false)
+			pdf.Ln(3)
+		}
+	})
 }
 
 func DownloadEbookWordById(c *fiber.Ctx) error {
@@ -94,24 +130,21 @@ func DownloadEbookWordById(c *fiber.Ctx) error {
 	safeName := re.ReplaceAllString(existing.Title, "_")
 
 	saveDir := "./storage/word"
-	if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": fmt.Sprintf("Error Creating Directory: %v", err),
-		})
-	}
-
-	filePath := filepath.Join(saveDir, fmt.Sprintf("%s.docx", safeName))
+	os.MkdirAll(saveDir, os.ModePerm)
+	filePath := filepath.Join(saveDir, safeName+".docx")
 
 	doc := document.New()
 
-	titlePara := doc.AddParagraph()
-	titleRun := titlePara.AddRun()
-	titleRun.Properties().SetBold(true)
-	titleRun.Properties().SetSize(32)
-	titleRun.AddText(existing.Title)
-	doc.AddParagraph().AddRun().AddBreak()
+	// Title
+	title := doc.AddParagraph()
+	run := title.AddRun()
+	run.Properties().SetBold(true)
+	run.Properties().SetSize(32)
+	run.AddText(existing.Title)
+	doc.AddParagraph()
 
-	addFormattedHTML(doc, existing.HtmlContent)
+	// BODY
+	renderWord(doc, existing.HtmlContent)
 
 	if err := doc.SaveToFile(filePath); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -122,15 +155,10 @@ func DownloadEbookWordById(c *fiber.Ctx) error {
 	return c.Download(filePath, safeName+".docx")
 }
 
-func addFormattedHTML(doc *document.Document, html string) {
-	reader := strings.NewReader(html)
-	dom, err := goquery.NewDocumentFromReader(reader)
-	if err != nil {
-		fmt.Println("Error parsing HTML:", err)
-		return
-	}
+func renderWord(doc *document.Document, html string) {
+	dom, _ := goquery.NewDocumentFromReader(strings.NewReader(html))
 
-	dom.Find("h1, h2, h3, p, b, strong, i, em, u, ul, ol, li, br").Each(func(i int, s *goquery.Selection) {
+	dom.Find("body").Children().Each(func(i int, s *goquery.Selection) {
 		tag := goquery.NodeName(s)
 		text := strings.TrimSpace(s.Text())
 		if text == "" {
@@ -138,51 +166,55 @@ func addFormattedHTML(doc *document.Document, html string) {
 		}
 
 		switch tag {
-		case "h1", "h2", "h3":
+
+		case "h1":
 			para := doc.AddParagraph()
 			run := para.AddRun()
 			run.Properties().SetBold(true)
-			switch tag {
-			case "h1":
-				run.Properties().SetSize(28)
-			case "h2":
-				run.Properties().SetSize(24)
-			case "h3":
-				run.Properties().SetSize(20)
-			}
+			run.Properties().SetSize(28)
 			run.AddText(text)
 
-		case "b", "strong":
+		case "h2":
 			para := doc.AddParagraph()
 			run := para.AddRun()
 			run.Properties().SetBold(true)
+			run.Properties().SetSize(24)
+			run.AddText(text)
+
+		case "h3":
+			para := doc.AddParagraph()
+			run := para.AddRun()
+			run.Properties().SetBold(true)
+			run.Properties().SetSize(20)
+			run.AddText(text)
+
+		case "p":
+			para := doc.AddParagraph()
+			run := para.AddRun()
+			run.Properties().SetSize(12)
+			run.AddText(text)
+
+		case "ul":
+			s.Find("li").Each(func(i int, li *goquery.Selection) {
+				para := doc.AddParagraph()
+				run := para.AddRun()
+				run.Properties().SetSize(12)
+				run.AddText("• " + li.Text())
+			})
+
+		case "strong", "b":
+			para := doc.AddParagraph()
+			run := para.AddRun()
+			run.Properties().SetBold(true)
+			run.Properties().SetSize(12)
 			run.AddText(text)
 
 		case "i", "em":
 			para := doc.AddParagraph()
 			run := para.AddRun()
 			run.Properties().SetItalic(true)
+			run.Properties().SetSize(12)
 			run.AddText(text)
-
-		case "u":
-			para := doc.AddParagraph()
-			run := para.AddRun()
-			run.Properties().SetUnderline(wml.ST_UnderlineSingle, color.Auto)
-
-			run.AddText(text)
-
-		case "ul", "ol", "li":
-			para := doc.AddParagraph()
-			run := para.AddRun()
-			run.AddText("• " + text)
-
-		case "p":
-			para := doc.AddParagraph()
-			run := para.AddRun()
-			run.AddText(text)
-
-		case "br":
-			doc.AddParagraph().AddRun().AddBreak()
 		}
 	})
 }

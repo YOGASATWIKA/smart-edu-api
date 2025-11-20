@@ -140,7 +140,6 @@ func DownloadEbookWordById(c *fiber.Ctx) error {
 	run := title.AddRun()
 	run.Properties().SetBold(true)
 	run.Properties().SetSize(32)
-	run.AddText(existing.Title)
 	doc.AddParagraph()
 
 	// BODY
